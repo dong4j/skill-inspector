@@ -32,6 +32,7 @@ public class RuleRunner {
             new StructuralRules(),
             new QualityRules(),
             new ReferenceRules(),
+            new ResourceRules(),
             new SecurityRules()
         ));
     }
