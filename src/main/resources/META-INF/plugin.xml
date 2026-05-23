@@ -31,8 +31,10 @@
                                  instance="dev.dong4j.idea.skill.inspector.settings.SkillInspectorConfigurable"
                                  displayName="Skill Inspector"/>
 
-        <!-- 状态栏开关 -->
-        <statusBarWidgetFactory implementation="dev.dong4j.idea.skill.inspector.statusbar.SkillInspectorStatusBarWidgetFactory"/>
+        <!-- 状态栏开关：id 必须与 SkillInspectorStatusBarWidgetFactory.getId() 一致，
+             否则 verifyPluginStructure 会报错 -->
+        <statusBarWidgetFactory id="SkillInspectorStatusBar"
+                                implementation="dev.dong4j.idea.skill.inspector.statusbar.SkillInspectorStatusBarWidgetFactory"/>
 
         <!-- 通知组 -->
         <!--suppress PluginXmlI18n -->
