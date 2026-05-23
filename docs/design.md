@@ -89,6 +89,8 @@ V1 不做以下能力：
 
 ## 4. 领域模型
 
+领域模型集中在 `model/` 包下，全部用 Java `record` 表达，并尽量不依赖 IntelliJ API，便于后续把检查核心复用到 CLI 或构建期校验。
+
 ### 4.1 SkillFile
 
 `SkillFile` 表示一个 `SKILL.md` 文件及其上下文。
@@ -97,7 +99,7 @@ V1 不做以下能力：
 public record SkillFile(
     PsiFile psiFile,
     String skillDirectoryName,
-    @Nullable VirtualFile skillRoot,
+    @Nullable VirtualFile skillDirectory,
     @Nullable SkillFrontMatter frontMatter,
     SkillBody body
 ) {}
@@ -105,32 +107,58 @@ public record SkillFile(
 
 关键约束：
 
-- `psiFile.name` 必须等于 `SKILL.md`。
-- `skillDirectoryName` 来源于 `SKILL.md` 的父目录。
-- `skillRoot` 不在 V1 强依赖，因为不同 Agent 的根目录不同。
+- `psiFile.name` 必须等于 `SKILL.md`，由 `SkillFileDetector` 守门。
+- `skillDirectoryName` 来源于 `SKILL.md` 的父目录，用于校验 frontmatter `name`。
+- `skillDirectory` 仅在引用规则中用于解析相对路径，缺失时跳过引用检查。
 
 ### 4.2 SkillFrontMatter
 
-`SkillFrontMatter` 表示 YAML frontmatter 的解析结果。
+`SkillFrontMatter` 表示 YAML frontmatter 的解析结果。同时保留外层 `---` 与内部 YAML 内容的两套 offset，便于 Quick Fix 在内容区追加字段。
 
 ```java
 public record SkillFrontMatter(
     int startOffset,
     int endOffset,
-    Map<String, Object> values,
+    int contentStartOffset,
+    int contentEndOffset,
+    Map<String, String> values,
+    List<SkillYamlEntry> entries,
+    SkillMetadata metadata,
     @Nullable String parseError
 ) {}
 ```
 
 关键约束：
 
-- frontmatter 必须从文件开头的 `---` 开始。
-- 第二个 `---` 之前的内容按 YAML 解析。
-- YAML 解析失败时不继续做字段类型判断，只报告解析错误。
+- frontmatter 必须从文件开头的 `---` 开始（兼容 UTF-8 BOM）。
+- frontmatter 节点由 Markdown PSI 定位（`FRONT_MATTER` 元素类型），其内容再交给 YAML PSI 解析。
+- YAML 解析失败时仍返回 `SkillFrontMatter` 并填充 `parseError`，让规则层只针对解析成功的字段继续工作。
 
-### 4.3 SkillProblem
+### 4.3 SkillMetadata
 
-`SkillProblem` 是插件内部问题模型，最后映射为 IntelliJ 的 `ProblemDescriptor`。
+`SkillMetadata` 是 specification 中显式定义字段的强类型视图，规则层通过它访问 `name`、`description`、`license`、`compatibility`、`metadata`、`allowed-tools`，避免规则散落字符串 key。
+
+```java
+public record SkillMetadata(
+    @Nullable SkillYamlEntry name,
+    @Nullable SkillYamlEntry description,
+    @Nullable SkillYamlEntry license,
+    @Nullable SkillYamlEntry compatibility,
+    @Nullable SkillYamlEntry metadata,
+    @Nullable SkillYamlEntry allowedTools,
+    Map<String, SkillYamlEntry> entries
+) {}
+```
+
+### 4.4 SkillYamlEntry / SkillBody / SkillReference
+
+- `SkillYamlEntry(key, value, keyRange, valueRange)`：YAML 顶层条目。
+- `SkillBody(text, startOffset, endOffset)`：frontmatter 之后的 Markdown 正文及其 offset。
+- `SkillReference(target, targetRange)`：Markdown 正文中的本地链接目标，由 `MarkdownReferenceParser` 通过 Markdown PSI 提取。
+
+### 4.5 SkillProblem
+
+`SkillProblem` 是插件内部问题模型，最后由 `SkillMdInspection` 映射为 IntelliJ 的 `ProblemDescriptor`。
 
 ```java
 public record SkillProblem(
@@ -138,7 +166,7 @@ public record SkillProblem(
     SkillSeverity severity,
     String message,
     TextRange range,
-    List<SkillQuickFix> quickFixes
+    List<SkillFixType> fixTypes
 ) {}
 ```
 
@@ -147,60 +175,74 @@ public record SkillProblem(
 - 规则引擎可以脱离 IDE API 做单元测试。
 - 后续 Maven 插件或 CLI 可以复用同一套检查逻辑。
 - 不同输出渠道可以共享规则结果。
+- `fixTypes` 是语义型枚举，避免规则层直接构造 IntelliJ `LocalQuickFix` 对象。
+
+### 4.6 SkillFixType / SkillSeverity
+
+- `SkillFixType`：当前共 6 种确定性修复 — `ADD_FRONT_MATTER`、`ADD_NAME`、`ADD_DESCRIPTION`、`SYNC_NAME_WITH_DIRECTORY`、`CONVERT_NAME_TO_KEBAB`、`CREATE_MISSING_REFERENCE`。
+- `SkillSeverity`：`ERROR` / `WARNING` / `WEAK_WARNING`，由 `SkillMdInspection` 映射到 `ProblemHighlightType`。
 
 ## 5. 检查规则分层
 
-规则按确定性和风险分为四层。
+规则按确定性和风险分为四层。下表中的 ID 与代码中 `SkillProblem.ruleId` 一一对应，以代码为准。
+
+> 文件名检查 (`SKILL.md`) 不作为可上报规则，而是 `SkillFileDetector` 的入口门控，未命中文件名时整个 Inspection 直接跳过。
 
 ### 5.1 Structural Rules
 
 结构规则用于判断 skill 是否能被 Agent 正确识别。
 
-| Rule ID                           | Severity | 说明                    |
-|-----------------------------------|----------|-----------------------|
-| `skill.file.name`                 | Error    | 文件名必须为 `SKILL.md`     |
-| `skill.directory.name`            | Error    | 父目录名必须为 kebab-case    |
-| `frontmatter.missing`             | Error    | 缺少 YAML frontmatter   |
-| `frontmatter.invalid-yaml`        | Error    | frontmatter YAML 解析失败 |
-| `frontmatter.name.missing`        | Error    | 缺少 `name`             |
-| `frontmatter.name.mismatch`       | Error    | `name` 与父目录名不一致       |
-| `frontmatter.description.missing` | Error    | 缺少 `description`      |
+| Rule ID                              | Severity | 说明                                      |
+|--------------------------------------|----------|-----------------------------------------|
+| `skill.directory.name`               | Error    | 父目录名本身不符合 kebab-case                    |
+| `frontmatter.missing`                | Error    | 缺少 YAML frontmatter                     |
+| `frontmatter.invalid-yaml`           | Error    | frontmatter YAML 解析失败                   |
+| `frontmatter.name.missing`           | Error    | 缺少 `name`                               |
+| `frontmatter.name.too-long`          | Error    | `name` 超过 64 字符                         |
+| `frontmatter.name.invalid`           | Error    | `name` 不符合 kebab-case                   |
+| `frontmatter.name.mismatch`          | Error    | `name` 与父目录名不一致                         |
+| `frontmatter.description.missing`    | Error    | 缺少 `description`                        |
+| `frontmatter.description.too-long`   | Error    | `description` 超过 1024 字符                |
+| `frontmatter.compatibility.empty`    | Error    | 提供 `compatibility` 但内容为空                |
+| `frontmatter.compatibility.too-long` | Error    | `compatibility` 超过 500 字符               |
 
 ### 5.2 Quality Rules
 
 质量规则用于提高 skill 可用性，但不一定阻塞。
 
-| Rule ID                   | Severity     | 说明                         |
-|---------------------------|--------------|----------------------------|
-| `description.too-short`   | Warning      | 描述过短，可能无法帮助 Agent 选择 skill |
-| `description.too-generic` | Warning      | 描述过泛，例如只写 `helper`、`tool`  |
-| `body.missing-title`      | Weak Warning | 正文缺少一级标题                   |
-| `body.missing-trigger`    | Warning      | 正文没有说明何时使用                 |
-| `body.too-long`           | Warning      | 正文过长，建议拆分到 `references/`   |
+| Rule ID                     | Severity     | 说明                         |
+|-----------------------------|--------------|----------------------------|
+| `description.too-short`     | Warning      | 描述过短（< 20 字符），可能无法帮助 Agent 发现 skill |
+| `description.too-generic`   | Warning      | 描述过泛，例如只写 `helper`、`tool`  |
+| `description.missing-usage` | Warning      | description 未说明使用时机（缺 "use when"、"适用" 等触发语） |
+| `body.missing-title`        | Weak Warning | 正文缺少一级标题                   |
+| `body.missing-trigger`      | Warning      | 正文未说明何时使用                  |
+| `body.too-long`             | Warning      | 正文超过 12000 字符，建议拆分到 `references/` |
 
 ### 5.3 Reference Rules
 
-引用规则用于保证 skill 关联资源可访问。
+引用规则用于保证 skill 关联资源可访问。引用通过 Markdown PSI 提取 link destination 节点，规则在文件系统层校验存在性、目录边界和大小写。
 
-| Rule ID                     | Severity     | 说明                                |
-|-----------------------------|--------------|-----------------------------------|
-| `reference.missing-file`    | Warning      | Markdown 相对链接指向的文件不存在             |
-| `reference.outside-skill`   | Warning      | 引用路径跳出当前 skill 目录                 |
-| `reference.case-mismatch`   | Warning      | 路径大小写和文件系统不一致                     |
-| `resource.unused-reference` | Weak Warning | `references/` 下文件未被 `SKILL.md` 引用 |
-| `script.missing-usage`      | Weak Warning | `scripts/` 下脚本未在正文说明用法            |
+| Rule ID                   | Severity     | 说明                              |
+|---------------------------|--------------|---------------------------------|
+| `reference.invalid-path`  | Warning      | Markdown 链接目标不是合法路径             |
+| `reference.missing-file`  | Warning      | Markdown 相对链接指向的文件不存在            |
+| `reference.outside-skill` | Warning      | 引用路径跳出当前 skill 目录               |
+| `reference.case-mismatch` | Warning      | 路径大小写和文件系统不一致（防止迁移到 Linux 后失效） |
+
+> 待实现：`resource.unused-reference`（`references/` 下未被引用的文件）、`script.missing-usage`（`scripts/` 下脚本未在正文说明用法）。
 
 ### 5.4 Security Rules
 
-安全规则用于发现高风险内容。
+安全规则用于发现高风险内容。V1 只定位和提示，不自动改写。
 
-| Rule ID                       | Severity | 说明                            |
-|-------------------------------|----------|-------------------------------|
-| `security.secret-pattern`     | Error    | 疑似 token、password、private key |
-| `security.dangerous-command`  | Error    | 出现 `rm -rf /`、`curl           | sh` 等危险命令 |
-| `security.allowed-tools-bash` | Warning  | `allowed-tools` 包含过宽的 `Bash`  |
-| `security.sensitive-path`     | Warning  | 引导访问 `.ssh`、`.env`、`~/.aws`   |
-| `security.prompt-injection`   | Warning  | 出现忽略上级指令等注入式文案                |
+| Rule ID                       | Severity | 说明                                         |
+|-------------------------------|----------|--------------------------------------------|
+| `security.secret-pattern`     | Error    | 疑似 token / password / secret / private key |
+| `security.dangerous-command`  | Error    | 出现 `rm -rf /`、`curl ... \| sh` 等危险命令       |
+| `security.allowed-tools-bash` | Warning  | `allowed-tools` 包含过宽的 `Bash` 权限             |
+| `security.sensitive-path`     | Warning  | 引导访问 `.ssh` / `.env` / `~/.aws`            |
+| `security.prompt-injection`   | Warning  | 出现 `ignore previous instructions` 等注入式文案  |
 
 ## 6. 检查流程
 
@@ -220,133 +262,158 @@ PsiFile
 
 职责：
 
-- 判断当前文件是否为 `SKILL.md`。
-- 获取父目录名。
-- 初步判断父目录是否像 skill 目录。
+- 仅根据 `PsiFile.getName()` 判断当前文件是否等于 `SKILL.md`。
 
 不负责：
 
+- 不读取 frontmatter，不判断父目录名。
 - 不判断当前 skill 属于 Claude、Codex、Junie 还是 Cursor。
 - 不扫描整个项目。
+
+父目录信息由 `SkillModelBuilder` 在构建 `SkillFile` 时通过 `VirtualFile.getParent()` 获取，规则层只消费已组装好的领域模型。
 
 ### 6.2 FrontMatterParser
 
 职责：
 
-- 找到文件开头的 frontmatter。
-- 记录 frontmatter 在文档中的 offset。
-- 使用 YAML parser 解析键值。
-- 保留解析错误和原始文本范围。
+- 通过 Markdown PSI 定位 `FRONT_MATTER` 节点（兼容 UTF-8 BOM）。
+- 在 frontmatter 节点内部找到首尾 `---`，截取内容范围。
+- 把内容文本交给 YAML PSI（`YAMLLanguage`）解析，提取顶层 key/value 与 offset。
+- 把 YAML 解析错误聚合到 `SkillFrontMatter.parseError`。
 
 设计约束：
 
-- 解析失败时仍返回 `SkillFrontMatter`，并携带 `parseError`。
+- 不使用正则切分 frontmatter，避免错过 `---` 嵌入正文或字段值跨行的情况。
+- 解析失败时仍返回 `SkillFrontMatter`，并携带 `parseError`，规则层只跳过依赖字段的检查，但仍能上报 `frontmatter.invalid-yaml`。
 - 不能因为 YAML 错误导致整个 Inspection 崩溃。
 
-### 6.3 RuleRunner
+### 6.3 MarkdownReferenceParser
 
 职责：
 
-- 按规则集合执行检查。
-- 根据用户启用的 profile 决定规则开关。
-- 输出统一的 `SkillProblem`。
+- 在 `SkillFile.body` 范围内遍历 Markdown PSI。
+- 收集 `LINK_DESTINATION` 元素，复用 IDE 自身的 Markdown 语法理解。
+- 规范化 `<path with spaces>` 形式，返回 `SkillReference`。
 
-规则执行顺序：
+设计约束：
 
-1. 结构规则。
-2. frontmatter 字段规则。
-3. Markdown 正文规则。
-4. 引用规则。
-5. 安全规则。
+- 不用正则扫描正文，否则会被代码块、HTML 注释中的伪链接误导。
+- 链接锚点、查询串和绝对 URL 由 `ReferenceRules` 在文件系统层进一步过滤。
 
-结构规则失败时，后续依赖模型的规则应跳过，避免重复噪音。
+### 6.4 RuleRunner
+
+职责：
+
+- 按固定顺序执行规则集合，输出 `SkillProblem` 聚合列表。
+- V1 不区分 profile，所有默认规则都会运行；用户禁用 Inspection 总开关时，整个 Inspection 在入口跳过。
+
+规则执行顺序（与 `RuleRunner` 构造函数一致）：
+
+1. `StructuralRules`：frontmatter 必填字段、长度和命名规范。
+2. `QualityRules`：description 和正文质量。
+3. `ReferenceRules`：Markdown 引用。
+4. `SecurityRules`：secret / 危险命令 / `allowed-tools` / 敏感路径 / prompt injection。
+
+结构规则在 frontmatter 缺失或 YAML 解析失败时会提前 return，避免对依赖字段的后续检查产生噪音。其他规则若拿到 `parseError`，也会跳过依赖 metadata 字段的逻辑。
 
 ## 7. Quick Fix 策略
 
-Quick Fix 只处理确定性问题。
+Quick Fix 只处理确定性问题，对应 `SkillFixType` 枚举值；具体写入逻辑集中在 `quickfix/SkillQuickFix.java`，纯文本拼接放在 `SkillQuickFixTexts` 便于单元测试。
 
-允许自动修复：
+当前已实现的修复：
 
-- 创建缺失 frontmatter 模板。
-- 补齐缺失 `name`。
-- 将 `name` 修正为父目录名。
-- 将非法目录名建议为 kebab-case。
-- 创建缺失的引用文件。
+- `ADD_FRONT_MATTER`：在文件开头插入 `---\nname: <dir>\ndescription: TODO ...\n---\n` 模板。
+- `ADD_NAME`：在已有 frontmatter 内容区追加 `name` 字段。
+- `ADD_DESCRIPTION`：在已有 frontmatter 内容区追加 `description` 字段（值为占位说明，不替用户生成主观内容）。
+- `SYNC_NAME_WITH_DIRECTORY`：将 frontmatter 中的 `name` 值替换为父目录名。
+- `CONVERT_NAME_TO_KEBAB`：把不合规的 `name` 规范化为合法 kebab-case，使用 `SkillQuickFixTexts.toKebabCaseName` 的纯函数。
+- `CREATE_MISSING_REFERENCE`：为 `reference.missing-file` 创建空文件（含父目录），仅在 skill 目录内部写入，使用 VFS API 让 IDE 立即识别。
 
-不自动修复：
+不自动修复（明确排除）：
 
 - 不自动扩写 description。
-- 不自动重写正文 workflow。
-- 不自动删除 `allowed-tools: Bash`。
+- 不自动重写正文 workflow / 不自动拆分过长正文（拆分点带主观判断）。
+- 不自动删除 `allowed-tools: Bash`（收窄策略带主观判断）。
 - 不自动删除疑似敏感内容。
 
 对于安全问题，只提供解释和定位，必要时提供文档链接或建议，不直接改写用户内容。
 
 ## 8. 配置模型
 
-V1 设置项保持最小：
+V1 设置项保持最小，由 `SkillInspectorSettings`（应用级 `PersistentStateComponent`）持久化：
 
 ```text
 Skill Inspector
-├── Enabled profiles
-│   ├── Generic Agent Skills
-│   ├── Claude Code
-│   ├── OpenAI Codex
-│   ├── JetBrains Junie
-│   └── GitHub Copilot / VS Code
-├── Rule severity overrides
-├── Max SKILL.md length
-└── Security scan enabled
+└── Enable SKILL.md format inspection  (默认开启)
 ```
 
-默认启用：
+- 设置页 `SkillInspectorConfigurable` 提供一个复选框。
+- 状态栏 `SkillInspectorStatusBarWidget` 提供同一开关的快速切换，避免设置入口分散。
+- 关闭开关时 `SkillMdInspection` 直接返回空问题数组，跳过所有规则。
 
-- Generic Agent Skills
-- OpenAI Codex
-- Claude Code
+未实现（计划见 `docs/roadmap.md` V2/V4）：
 
-原因是这些 profile 覆盖当前最常见的 `SKILL.md` 写作场景，同时避免 V1 一开始引入过多工具差异。
+- 多 Agent Profile（Generic / Claude Code / Codex / Junie / Copilot / Cursor）。
+- 规则严重度覆盖。
+- 自定义最大正文长度等阈值。
+- 单独的安全扫描开关。
 
 ## 9. 模块划分
 
-建议代码结构：
+当前实际代码结构：
 
 ```text
 src/main/java/dev/dong4j/idea/skill/inspector/
+├── PluginContents.java                # 插件标识常量
+├── action/
+│   └── SkillInspectorAction.java      # 右键菜单入口（V1 占位通知，未接入完整 Inspection）
 ├── detection/
-│   └── SkillFileDetector.java
+│   └── SkillFileDetector.java         # 仅根据文件名 SKILL.md 决定是否启用 Inspection
+├── inspection/
+│   └── SkillMdInspection.java         # LocalInspectionTool 适配层
 ├── model/
 │   ├── SkillFile.java
 │   ├── SkillFrontMatter.java
+│   ├── SkillMetadata.java
 │   ├── SkillBody.java
-│   └── SkillProblem.java
+│   ├── SkillYamlEntry.java
+│   ├── SkillReference.java
+│   ├── SkillProblem.java
+│   ├── SkillFixType.java
+│   └── SkillSeverity.java
 ├── parser/
-│   ├── FrontMatterParser.java
-│   └── MarkdownReferenceParser.java
+│   ├── FrontMatterParser.java         # Markdown PSI 定位 + YAML PSI 解析
+│   ├── FrontMatterParseResult.java
+│   ├── MarkdownReferenceParser.java   # Markdown PSI 提取 link destination
+│   └── SkillModelBuilder.java
+├── quickfix/
+│   ├── SkillQuickFix.java             # 通用 LocalQuickFix 实现，按 SkillFixType 分发
+│   └── SkillQuickFixTexts.java        # 纯文本生成工具（便于单测）
 ├── rules/
 │   ├── SkillRule.java
 │   ├── RuleRunner.java
 │   ├── StructuralRules.java
-│   ├── FrontMatterRules.java
-│   ├── BodyQualityRules.java
+│   ├── QualityRules.java
 │   ├── ReferenceRules.java
 │   └── SecurityRules.java
-├── inspection/
-│   └── SkillMdInspection.java
-├── quickfix/
-│   ├── AddFrontMatterFix.java
-│   ├── SyncNameWithDirectoryFix.java
-│   └── CreateMissingReferenceFix.java
-└── settings/
-    ├── SkillInspectorSettings.java
-    └── SkillInspectorConfigurable.java
+├── settings/
+│   ├── SkillInspectorSettings.java    # 应用级 PersistentStateComponent
+│   └── SkillInspectorConfigurable.java
+├── statusbar/
+│   ├── SkillInspectorStatusBarWidget.java
+│   └── SkillInspectorStatusBarWidgetFactory.java
+└── util/
+    ├── NotificationUtil.java
+    ├── SkillInspectorBundle.java
+    └── TextRangeUtil.java             # IntelliJ Inspection 范围安全裁剪
 ```
 
 模块边界：
 
-- `model`、`parser`、`rules` 尽量不依赖 IntelliJ API。
-- `inspection`、`quickfix`、`settings` 可以依赖 IntelliJ API。
-- 这样后续可以把检查核心迁移到 CLI 或 Maven 插件。
+- `model`、`rules`、`quickfix/SkillQuickFixTexts` 尽量不依赖 IntelliJ API，可以独立单元测试。
+- `parser` 必须依赖 IntelliJ Markdown / YAML PSI；测试通过 `ProjectExtension` 拉起轻量 fixture。
+- `inspection`、`quickfix/SkillQuickFix`、`settings`、`statusbar`、`action` 直接对接 IntelliJ Platform API。
+- 这样后续可以把检查核心迁移到 CLI 或 Maven 插件，只需要替换 `parser` 适配层。
 
 ## 10. 测试策略
 

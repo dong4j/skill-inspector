@@ -7,13 +7,14 @@
 
 ## 版本路线
 
-### V1: SKILL.md Inspection
+### V1: SKILL.md Inspection（已落地）
 
-- 实时检查 `SKILL.md`。
+- 实时检查 `SKILL.md`（结构、质量、引用、安全四套规则）。
 - Problems 面板展示问题。
-- 基础 Quick Fix。
-- Markdown 相对链接检查。
-- 安全风险提示。
+- 保守 Quick Fix：补 frontmatter / `name` / `description` / 同步 `name` 为父目录名。
+- Markdown 相对链接检查：缺失、目录越界、大小写、非法路径。
+- 安全风险提示：疑似密钥、危险命令、过宽 `allowed-tools`、敏感路径、prompt injection。
+- 应用级总开关 + 状态栏快速切换。
 
 ### V2: 多 Agent Profile
 
@@ -43,37 +44,29 @@
 
 ## 技术实现方向
 
-插件实现会优先采用 IntelliJ Platform 的 Inspection 体系：
+插件实现采用 IntelliJ Platform 的 Inspection 体系：
 
-- `LocalInspectionTool` 负责检查 `SKILL.md`。
-- YAML frontmatter 先使用文本切分和 YAML parser 解析。
-- Markdown 相对链接通过 PSI 或 Markdown 文本扫描识别。
-- 问题通过 `ProblemDescriptor` 注册到 Problems 面板。
-- 自动修复通过 `LocalQuickFix` 修改文档内容或创建文件。
-- 配置项放入 IDE Settings，后续支持 profile 和规则开关。
+- `LocalInspectionTool` 负责检查 `SKILL.md`，单一 `SkillMdInspection` 通过内部 `RuleRunner` 调度多套规则。
+- YAML frontmatter 由 Markdown PSI 定位 `FRONT_MATTER` 节点后交给 YAML PSI 解析（不再使用文本切分 / 正则）。
+- Markdown 相对链接通过 Markdown PSI `LINK_DESTINATION` 节点提取，不做正则扫描。
+- 问题通过 `ProblemDescriptor` 注册到 Problems 面板；严重度由 `SkillSeverity` 映射到 `ProblemHighlightType`。
+- 自动修复通过单一 `SkillQuickFix` + `SkillFixType` 枚举派发，纯文本逻辑集中在 `SkillQuickFixTexts` 便于单测。
+- 配置项放入 IDE Settings + Status Bar，V2 起逐步支持 profile 与规则开关。
 
-建议的代码结构：
+实际代码结构（与 `docs/design.md` §9 同步，仅示意，不需对齐建议层级）：
 
 ```text
 src/main/java/dev/dong4j/idea/skill/inspector/
+├── action/
+├── detection/
 ├── inspection/
-│   ├── SkillMdInspection.java
-│   ├── SkillFrontMatterInspection.java
-│   ├── SkillReferenceInspection.java
-│   └── SkillSecurityInspection.java
+├── model/
 ├── parser/
-│   ├── SkillFileDetector.java
-│   ├── FrontMatterParser.java
-│   └── SkillModel.java
 ├── quickfix/
-│   ├── AddMissingFrontMatterFix.java
-│   ├── RenameSkillNameFix.java
-│   ├── CreateMissingReferenceFix.java
-│   └── RestrictAllowedToolsFix.java
+├── rules/
 ├── settings/
-│   └── SkillInspectorSettings.java
-└── toolwindow/
-    └── SkillExplorerToolWindowFactory.java
+├── statusbar/
+└── util/
 ```
 
 ## 产品定位

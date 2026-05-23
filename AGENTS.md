@@ -55,19 +55,22 @@ javaVersion=21
 ```text
 src/main/java/dev/dong4j/idea/skill/inspector/
 ├── PluginContents.java          # 插件常量
-├── action/                      # 用户交互入口
-├── detection/                   # Skill 文件检测 (待实现)
-├── inspection/                  # Inspection 实现 (待实现)
-├── model/                       # 领域模型 (待实现)
-├── parser/                      # frontmatter/Markdown 解析 (待实现)
-├── quickfix/                    # Quick Fix 实现 (待实现)
-├── rules/                       # 检查规则 (待实现)
-├── settings/                    # 插件配置 (待实现)
-├── toolwindow/                  # ToolWindow (待实现)
+├── action/                      # 用户交互入口（当前 SkillInspectorAction 仅触发占位通知）
+├── detection/                   # Skill 文件检测（按文件名匹配 SKILL.md）
+├── inspection/                  # LocalInspectionTool 适配层
+├── model/                       # 领域模型 record（SkillFile / SkillFrontMatter / SkillMetadata 等）
+├── parser/                      # Markdown PSI + YAML PSI 解析
+├── quickfix/                    # Quick Fix 实现（SkillQuickFix + SkillQuickFixTexts）
+├── rules/                       # 检查规则（Structural / Quality / Reference / Security）
+├── settings/                    # 应用级设置 + Settings 页
+├── statusbar/                   # 状态栏开关
 └── util/                        # 工具类
     ├── NotificationUtil.java      # 通知工具
-    └── SkillInspectorBundle.java  # 国际化
+    ├── SkillInspectorBundle.java  # 国际化
+    └── TextRangeUtil.java         # TextRange 安全裁剪
 ```
+
+> ToolWindow 是 V3 计划能力，当前未实现，包不存在。
 
 ### 注释风格
 
@@ -92,7 +95,7 @@ src/main/java/dev/dong4j/idea/skill/inspector/
 public record SkillFile(
     PsiFile psiFile,
     String skillDirectoryName,
-    @Nullable VirtualFile skillRoot,
+    @Nullable VirtualFile skillDirectory,
     @Nullable SkillFrontMatter frontMatter,
     SkillBody body
 ) {}
@@ -142,32 +145,42 @@ public record SkillFile(
 
 ### 规则 ID 命名
 
-格式: `{category}.{specific}`
+格式: `{category}.{specific}`，与代码中 `SkillProblem.ruleId` 严格一致。完整清单见 `docs/rules.md`，示例：
 
 ```
-skill.file.name
 frontmatter.missing
 frontmatter.name.mismatch
+frontmatter.description.too-long
 description.too-short
+description.missing-usage
 reference.missing-file
+reference.case-mismatch
 security.dangerous-command
 ```
 
 ## 常见任务指南
 
-### 添加新 Inspection
+### 新增规则（推荐方式）
 
-1. 在 `inspection/` 创建 `XxxInspection.java` 继承 `LocalInspectionTool`
-2. 在 `plugin.xml` 注册 `<localInspection>` 扩展
-3. 在 `rules/` 添加对应规则类（可脱离 IDE API 测试）
-4. 更新 `docs/rules.md` 规则文档
-5. 添加单元测试
+V1 默认走"单 Inspection + 多规则"路径，无需新增 Inspection 类：
+
+1. 在 `rules/` 已有规则类中追加方法，或新增一个 `XxxRules implements SkillRule`，输出 `SkillProblem`。
+2. 在 `RuleRunner` 默认列表里注册新规则类。
+3. 在 `SkillInspectorBundle.properties` 与 `SkillInspectorBundle_zh_CN.properties` 中新增对应消息 key。
+4. 在 `docs/rules.md` 表格补充规则 ID、严重度、说明、Quick Fix 关联。
+5. 在 `src/test/java/.../rules/` 加单元测试（参考 `StructuralRulesTest` 通过 `SkillFileTestFactory.skillFile(text, dirName)` 注入领域模型）。
+
+> 真正需要"独立 Inspection"的场景（例如非 `SKILL.md` 文件检查）才在 `inspection/` 新建类，并在 `plugin.xml` 注册 `<localInspection>`。
 
 ### 添加 Quick Fix
 
-1. 在 `quickfix/` 创建 `XxxFix.java` 实现 `LocalQuickFix`
-2. 在对应 Inspection 中返回包含该 Fix 的 `ProblemDescriptor`
-3. 更新 `docs/todo.md` 中的 Quick Fix 方向章节
+1. 在 `model/SkillFixType` 中新增枚举值。
+2. 在 `quickfix/SkillQuickFix.applyFix` 的 `switch` 中处理新枚举，写入逻辑尽量委托给 `SkillQuickFixTexts`（纯文本函数易测）。
+3. 在 `quickfix/SkillQuickFix.getFamilyName` 中映射 bundle key。
+4. 在 `SkillInspectorBundle*.properties` 中加 `quickfix.*` 文案。
+5. 在对应规则中把新的 `SkillFixType` 放入 `SkillProblem.fixTypes`。
+6. 在 `SkillQuickFixTextsTest` 补充纯文本边界单测；如需真实 IDE 写操作验证，新增 fixture 测试。
+7. 更新 `docs/todo.md` 与 `docs/rules.md` 的 Quick Fix 状态。
 
 ### 修改插件配置
 
@@ -241,6 +254,10 @@ security.dangerous-command
 - 重要设计决策（新增/移除核心能力）
 - 常见任务模式变化（新增典型开发场景）
 
+### `SkillInspectorAction` 当前行为说明
+
+V1 中右键菜单的 `Validate Skill` Action 仍是占位：只检查项目 / 文件上下文，然后通过 `NotificationUtil.showInfo` 显示一条"已初始化"通知，**不**会执行 Inspection 或 Quick Fix。真正的检查能力依靠 `LocalInspectionTool`，会在用户打开 `SKILL.md` 时自动启用。后续会让 Action 一次性运行检查并把问题写入 Problems 面板。
+
 ---
 
-*最后更新: 2026-05-23 - 初始版本，整理项目基础信息*
+*最后更新: 2026-05-23 - 与实际代码对齐：补 statusbar/ 包、修正规则 ID 示例、更新规则与 Quick Fix 添加流程、说明 Action 占位行为*
