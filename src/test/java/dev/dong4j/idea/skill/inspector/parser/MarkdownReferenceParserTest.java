@@ -57,6 +57,23 @@ class MarkdownReferenceParserTest {
     }
 
     @Test
+    void shouldCollectLinkDestinationFromReferenceStyleDefinition() {
+        // 模拟 reference-style 链接:
+        //   正文出现 [guide][ref], 在文件尾部有 `[ref]: references/guide.md` 这种定义.
+        // JetBrains Markdown PSI 会把定义节点表示为 LINK_DEFINITION, 内部包含一个 LINK_DESTINATION 子节点.
+        // 现有递归解析逻辑能直接拿到该 destination, 因此 reference-style 链接天然被支持.
+        PsiElement destinationInDefinition = linkDestination("references/guide.md", TextRange.create(70, 89));
+        PsiElement linkDefinition = compositeElement(destinationInDefinition);
+        SkillFile skillFile = skillFile(linkDefinition);
+
+        List<SkillReference> references = MarkdownReferenceParser.parse(skillFile);
+
+        assertThat(references)
+            .extracting(SkillReference::target)
+            .containsExactly("references/guide.md");
+    }
+
+    @Test
     void shouldStripAngleBracketsFromDestination() {
         PsiElement reference = linkDestination("<references/guide.md>", TextRange.create(70, 91));
         SkillFile skillFile = skillFile(reference);
@@ -81,6 +98,21 @@ class MarkdownReferenceParserTest {
         when(element.getText()).thenReturn(text);
         when(element.getTextRange()).thenReturn(range);
         when(element.getChildren()).thenReturn(PsiElement.EMPTY_ARRAY);
+        return element;
+    }
+
+    /**
+     * 构造一个"非 LINK_DESTINATION"的 composite PSI 节点, 用于模拟 LINK_DEFINITION 等包裹节点。
+     * <p> 让 {@code getNode()} 返回 null, 这样 parser 的判断会落到 "node == null" 分支并直接递归 children,
+     * 与真实 PSI 中"wrapper 节点的 element type 不是 LINK_DESTINATION"行为等价.
+     * <p> 选择 null 而不是 mock IElementType 是因为 IElementType 是 final/sealed, Mockito 无法直接 mock.
+     *
+     * @param children wrapper 节点下面挂的子节点
+     */
+    private PsiElement compositeElement(PsiElement... children) {
+        PsiElement element = mock(PsiElement.class);
+        when(element.getNode()).thenReturn(null);
+        when(element.getChildren()).thenReturn(children);
         return element;
     }
 
