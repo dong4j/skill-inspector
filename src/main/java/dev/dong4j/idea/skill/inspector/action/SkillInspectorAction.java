@@ -1,27 +1,51 @@
 package dev.dong4j.idea.skill.inspector.action;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import dev.dong4j.idea.skill.inspector.detection.SkillFileDetector;
+import dev.dong4j.idea.skill.inspector.model.SkillFile;
+import dev.dong4j.idea.skill.inspector.model.SkillProblem;
+import dev.dong4j.idea.skill.inspector.model.SkillSeverity;
+import dev.dong4j.idea.skill.inspector.parser.SkillModelBuilder;
+import dev.dong4j.idea.skill.inspector.rules.RuleRunner;
 import dev.dong4j.idea.skill.inspector.util.NotificationUtil;
+import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 import icons.SkillInspectorIcons;
 
 /**
  * Skill 校验入口动作
- * <p> 这是插件初始化阶段保留的最小 Action, 用于后续接入 SKILL.md 规范检查流程.
- * <p> 该动作会在项目和文件可用时启用, 并在执行时显示当前文件的占位校验提示.
- * <p> 具体功能包括:
+ * <p> 用户右键 "Validate Skill" 时触发: 扫描当前项目里所有 {@code SKILL.md} 文件,
+ * 运行 {@link RuleRunner} 收集问题, 汇总 Error / Warning 数量并通过通知反馈给用户.
+ * <p> 关键设计:
  * <ul>
- * <li> 初始化动作标题和描述 </li>
- * <li> 在项目和文件存在的情况下启用动作 </li>
- * <li> 执行动作时显示占位校验消息, 为后续 Inspection 接入保留入口 </li>
- * <li> 在项目或文件不存在时显示错误信息 </li>
+ *   <li>在 read action 内通过 {@link FilenameIndex} 收集所有 SKILL.md, 兼容未打开的文件.</li>
+ *   <li>对已打开的文件触发 {@link DaemonCodeAnalyzer#restart(PsiFile)},
+ *       让 Problems 面板自动更新, 不需要用户重新打开文件.</li>
+ *   <li>扫描完毕后激活 Problems View, 把汇总结果以通知形式弹出, 并保留点击跳转到第一个有错文件的能力.</li>
+ *   <li>整个动作在后台 {@link Task.Backgroundable} 内执行, 大项目下不会卡 UI.</li>
  * </ul>
  *
  * @author dong4j
@@ -33,9 +57,7 @@ import icons.SkillInspectorIcons;
 public class SkillInspectorAction extends AnAction {
 
     /**
-     * 构造函数, 用于初始化 SkillInspectorAction 实例
-     * <p> 通过调用父类构造函数设置 Action 的标题, 描述和图标
-     *
+     * 构造函数, 初始化 Action 的标题, 描述与图标
      */
     public SkillInspectorAction() {
         super(
@@ -45,45 +67,170 @@ public class SkillInspectorAction extends AnAction {
         );
     }
 
-    /**
-     * 执行 Action 的操作逻辑
-     * <p> 当用户在编辑器中右键点击文件并选择此 Action 时触发该方法.
-     * 当前阶段只检查上下文是否可用并显示占位通知, 后续会替换为真实的 SKILL.md 校验流程.
-     *
-     * @param e AnActionEvent 事件对象, 包含触发 Action 的上下文信息
-     */
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
-        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
-
         if (project == null) {
-            NotificationUtil.showError(project, SkillInspectorBundle.message("error.no.project"));
+            NotificationUtil.showError(null, SkillInspectorBundle.message("error.no.project"));
             return;
         }
 
-        if (psiFile == null) {
-            NotificationUtil.showError(project, SkillInspectorBundle.message("error.no.file"));
-            return;
-        }
+        ProgressManager.getInstance().run(new Task.Backgroundable(
+            project,
+            SkillInspectorBundle.message("action.validate.skill.title"),
+            true
+        ) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                ValidationSummary summary = ApplicationManager.getApplication()
+                    .runReadAction((com.intellij.openapi.util.Computable<ValidationSummary>) () ->
+                        scanProject(project, indicator));
 
-        // 当前只保留插件初始化入口, 后续接入真实 SKILL.md 规范检查.
-        String fileName = psiFile.getName();
-        NotificationUtil.showInfo(project, SkillInspectorBundle.message("success.validation.placeholder", fileName));
+                ApplicationManager.getApplication().invokeLater(() -> publishResult(project, summary));
+            }
+        });
     }
 
     /**
-     * 更新操作按钮的可用状态
-     * <p> 根据当前项目和文件的存在性, 设置该操作按钮是否可用
-     *
-     * @param e 事件对象, 包含当前的项目和文件信息
+     * 扫描整个项目里所有 SKILL.md 并汇总规则结果
      */
+    @NotNull
+    private ValidationSummary scanProject(@NotNull Project project, @NotNull ProgressIndicator indicator) {
+        Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(
+            "SKILL.md",
+            GlobalSearchScope.projectScope(project)
+        );
+
+        if (files.isEmpty()) {
+            return ValidationSummary.empty();
+        }
+
+        RuleRunner runner = new RuleRunner();
+        int totalErrors = 0;
+        int totalWarnings = 0;
+        VirtualFile firstErrorFile = null;
+        List<PsiFile> openedSkillFiles = new ArrayList<>();
+
+        int index = 0;
+        for (VirtualFile virtualFile : files) {
+            indicator.checkCanceled();
+            indicator.setFraction(files.isEmpty() ? 0.0 : (double) index++ / files.size());
+            indicator.setText2(virtualFile.getPresentableUrl());
+
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile == null || !SkillFileDetector.isSkillFile(psiFile)) {
+                continue;
+            }
+
+            openedSkillFiles.add(psiFile);
+
+            SkillFile skillFile = SkillModelBuilder.build(psiFile);
+            List<SkillProblem> problems = runner.run(skillFile);
+            int fileErrors = 0;
+            int fileWarnings = 0;
+            for (SkillProblem problem : problems) {
+                if (problem.severity() == SkillSeverity.ERROR) {
+                    fileErrors++;
+                } else {
+                    fileWarnings++;
+                }
+            }
+            if (fileErrors > 0 && firstErrorFile == null) {
+                firstErrorFile = virtualFile;
+            }
+            totalErrors += fileErrors;
+            totalWarnings += fileWarnings;
+        }
+
+        return new ValidationSummary(files.size(), totalErrors, totalWarnings, firstErrorFile, openedSkillFiles);
+    }
+
+    /**
+     * 在 EDT 上发布扫描结果: 激活 Problems View + 触发已打开文件的 daemon 重启 + 弹通知
+     */
+    private void publishResult(@NotNull Project project, @NotNull ValidationSummary summary) {
+        if (project.isDisposed()) {
+            return;
+        }
+
+        if (summary.totalFiles == 0) {
+            NotificationUtil.showInfo(project, SkillInspectorBundle.message("action.validate.skill.no.skills"));
+            return;
+        }
+
+        // 触发已打开 SKILL.md 的 daemon 重启, Problems View 会自动展示这些文件的最新问题.
+        DaemonCodeAnalyzer daemon = DaemonCodeAnalyzer.getInstance(project);
+        for (PsiFile psiFile : summary.openedSkillFiles) {
+            if (psiFile.isValid()) {
+                daemon.restart(psiFile);
+            }
+        }
+
+        ToolWindow problems = ToolWindowManager.getInstance(project).getToolWindow("Problems View");
+        if (problems != null) {
+            problems.show();
+        }
+
+        String message = SkillInspectorBundle.message(
+            "action.validate.skill.completed",
+            summary.totalFiles,
+            summary.totalErrors,
+            summary.totalWarnings
+        );
+
+        if (summary.totalErrors > 0 && summary.firstErrorFile != null) {
+            NotificationUtil.showWarning(project, message);
+            // 自动把第一个有错的 SKILL.md 打到编辑器前台, 方便用户立刻处理.
+            FileEditorManager.getInstance(project).openFile(summary.firstErrorFile, true);
+        } else if (summary.totalErrors > 0) {
+            NotificationUtil.showWarning(project, message);
+        } else if (summary.totalWarnings > 0) {
+            NotificationUtil.showInfo(project, message);
+        } else {
+            NotificationUtil.showInfo(project, message);
+        }
+    }
+
     @Override
     public void update(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+        // 仅在有 project 时启用; 当前文件不必是 SKILL.md, 因为 Action 会扫整个项目.
+        e.getPresentation().setEnabledAndVisible(e.getProject() != null);
+    }
 
-        // 只有在有项目和文件时才启用
-        e.getPresentation().setEnabled(project != null && psiFile != null);
+    @Override
+    @NotNull
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
+    /**
+     * 扫描结果汇总
+     * <p> 用普通类(非 record) 是为了在 read action 与 EDT 之间方便传递,
+     * 同时保持字段可读名而不是泛型 tuple.
+     */
+    private static final class ValidationSummary {
+        final int totalFiles;
+        final int totalErrors;
+        final int totalWarnings;
+        @Nullable
+        final VirtualFile firstErrorFile;
+        final List<PsiFile> openedSkillFiles;
+
+        ValidationSummary(int totalFiles,
+                          int totalErrors,
+                          int totalWarnings,
+                          @Nullable VirtualFile firstErrorFile,
+                          @NotNull List<PsiFile> openedSkillFiles) {
+            this.totalFiles = totalFiles;
+            this.totalErrors = totalErrors;
+            this.totalWarnings = totalWarnings;
+            this.firstErrorFile = firstErrorFile;
+            this.openedSkillFiles = openedSkillFiles;
+        }
+
+        @NotNull
+        static ValidationSummary empty() {
+            return new ValidationSummary(0, 0, 0, null, List.of());
+        }
     }
 }
