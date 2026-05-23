@@ -3,6 +3,7 @@ package dev.dong4j.idea.skill.inspector.rules;
 import com.intellij.openapi.util.TextRange;
 
 import dev.dong4j.idea.skill.inspector.model.SkillFile;
+import dev.dong4j.idea.skill.inspector.model.SkillFixType;
 import dev.dong4j.idea.skill.inspector.model.SkillProblem;
 import dev.dong4j.idea.skill.inspector.model.SkillReference;
 import dev.dong4j.idea.skill.inspector.model.SkillSeverity;
@@ -130,12 +131,12 @@ public class ReferenceRules implements SkillRule {
         }
 
         if (!Files.exists(resolved)) {
-            problems.add(problem(
+            problems.add(new SkillProblem(
                 "reference.missing-file",
                 SkillSeverity.WARNING,
                 SkillInspectorBundle.message("inspection.reference.missing.file", target),
-                reference.targetRange(),
-                textLength
+                TextRangeUtil.clamp(reference.targetRange(), textLength),
+                List.of(SkillFixType.CREATE_MISSING_REFERENCE)
             ));
             return;
         }

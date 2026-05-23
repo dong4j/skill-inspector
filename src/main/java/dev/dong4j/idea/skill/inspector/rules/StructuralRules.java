@@ -48,8 +48,11 @@ public class StructuralRules implements SkillRule {
     public List<SkillProblem> check(@NotNull SkillFile skillFile) {
         List<SkillProblem> problems = new ArrayList<>();
         int textLength = skillFile.psiFile().getTextLength();
-        SkillFrontMatter frontMatter = skillFile.frontMatter();
 
+        // 目录名规则独立于 frontmatter, 即便缺少 YAML 头部也应能提示父目录命名问题.
+        checkDirectoryName(skillFile, problems, textLength);
+
+        SkillFrontMatter frontMatter = skillFile.frontMatter();
         if (frontMatter == null) {
             problems.add(new SkillProblem(
                 "frontmatter.missing",
@@ -78,6 +81,33 @@ public class StructuralRules implements SkillRule {
         checkDescription(problems, textLength, frontMatterRange, metadata);
         checkCompatibility(problems, textLength, metadata);
         return problems;
+    }
+
+    /**
+     * 校验父目录名本身是否符合 kebab-case
+     * <p> 与 {@code frontmatter.name.mismatch} 互补: 即便 frontmatter 缺失或父目录名与 name 一致,
+     * 也要单独提示作者把目录名改成规范格式, 避免将来重命名时出现"按规范改了 name 反而对不上目录"的死循环.
+     *
+     * @param skillFile  Skill 上下文
+     * @param problems   问题累积列表
+     * @param textLength 文本长度, 用于在文件开头创建安全范围
+     */
+    private void checkDirectoryName(@NotNull SkillFile skillFile,
+                                    @NotNull List<SkillProblem> problems,
+                                    int textLength) {
+        String dirName = skillFile.skillDirectoryName();
+        if (dirName.isBlank()) {
+            return;
+        }
+        if (!KEBAB_CASE.matcher(dirName).matches()) {
+            problems.add(new SkillProblem(
+                "skill.directory.name",
+                SkillSeverity.ERROR,
+                SkillInspectorBundle.message("inspection.skill.directory.name.invalid", dirName),
+                TextRangeUtil.fileStart(textLength),
+                List.of()
+            ));
+        }
     }
 
     /**
@@ -117,7 +147,7 @@ public class StructuralRules implements SkillRule {
                 SkillSeverity.ERROR,
                 SkillInspectorBundle.message("inspection.frontmatter.name.invalid"),
                 nameRange,
-                List.of()
+                List.of(SkillFixType.CONVERT_NAME_TO_KEBAB)
             ));
         }
 

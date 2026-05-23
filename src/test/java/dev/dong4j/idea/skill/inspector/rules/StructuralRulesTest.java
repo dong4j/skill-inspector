@@ -71,6 +71,72 @@ class StructuralRulesTest {
             .filteredOn(problem -> problem.ruleId().equals("frontmatter.name.mismatch"))
             .singleElement()
             .satisfies(problem -> assertThat(problem.fixTypes()).containsExactly(SkillFixType.SYNC_NAME_WITH_DIRECTORY));
+        assertThat(problems)
+            .filteredOn(problem -> problem.ruleId().equals("frontmatter.name.invalid"))
+            .singleElement()
+            .satisfies(problem -> assertThat(problem.fixTypes()).containsExactly(SkillFixType.CONVERT_NAME_TO_KEBAB));
+    }
+
+    @Test
+    void shouldReportInvalidDirectoryNameSeparatelyFromFrontMatter() {
+        String text = """
+            ---
+            name: My Skill
+            description: Use this skill when validating skill files.
+            ---
+            # Skill
+            """;
+
+        // 故意让目录名也不合规, 验证 skill.directory.name 与 frontmatter.name.invalid 互不掩盖.
+        List<SkillProblem> problems = rules.check(skillFile(text, "My Skill"));
+
+        assertThat(problems)
+            .extracting(SkillProblem::ruleId)
+            .contains("skill.directory.name", "frontmatter.name.invalid");
+    }
+
+    @Test
+    void shouldReportDirectoryNameEvenWhenFrontMatterIsMissing() {
+        List<SkillProblem> problems = rules.check(skillFile("# Skill\n", "Bad Dir"));
+
+        assertThat(problems)
+            .extracting(SkillProblem::ruleId)
+            .contains("skill.directory.name", "frontmatter.missing");
+    }
+
+    @Test
+    void shouldNotReportDirectoryNameForValidKebabCase() {
+        String text = """
+            ---
+            name: my-skill
+            description: Use this skill when validating skill files.
+            ---
+            # My Skill
+            """;
+
+        List<SkillProblem> problems = rules.check(skillFile(text, "my-skill"));
+
+        assertThat(problems)
+            .extracting(SkillProblem::ruleId)
+            .doesNotContain("skill.directory.name");
+    }
+
+    @Test
+    void shouldSkipDirectoryNameWhenContextIsUnavailable() {
+        String text = """
+            ---
+            name: my-skill
+            description: Use this skill when validating skill files.
+            ---
+            # My Skill
+            """;
+
+        // 父目录名为空表示未保存或临时 PSI, 此时不应报告 skill.directory.name 避免误报.
+        List<SkillProblem> problems = rules.check(skillFile(text, ""));
+
+        assertThat(problems)
+            .extracting(SkillProblem::ruleId)
+            .doesNotContain("skill.directory.name");
     }
 
     @Test

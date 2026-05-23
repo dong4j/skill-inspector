@@ -55,4 +55,59 @@ class SkillQuickFixTextsTest {
         assertThat(SkillQuickFixTexts.skillNameOrFallback("")).isEqualTo("new-skill");
         assertThat(SkillQuickFixTexts.skillNameOrFallback("my-skill")).isEqualTo("my-skill");
     }
+
+    @Test
+    void shouldConvertCommonSeparatorsToKebab() {
+        assertThat(SkillQuickFixTexts.toKebabCaseName("My Skill")).isEqualTo("my-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("my_skill")).isEqualTo("my-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("My.Skill")).isEqualTo("my-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("path/to/skill")).isEqualTo("path-to-skill");
+    }
+
+    @Test
+    void shouldCollapseConsecutiveSeparatorsAndTrimEdges() {
+        assertThat(SkillQuickFixTexts.toKebabCaseName("---weird   name---")).isEqualTo("weird-name");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("__my__skill__")).isEqualTo("my-skill");
+    }
+
+    @Test
+    void shouldDropNonAsciiCharactersWithoutTransliteration() {
+        assertThat(SkillQuickFixTexts.toKebabCaseName("中文 mixed")).isEqualTo("mixed");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("emoji 🎉 skill")).isEqualTo("emoji-skill");
+    }
+
+    @Test
+    void shouldFallbackWhenInputIsBlankOrAllInvalid() {
+        assertThat(SkillQuickFixTexts.toKebabCaseName(null)).isEqualTo("new-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("")).isEqualTo("new-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("   ")).isEqualTo("new-skill");
+        assertThat(SkillQuickFixTexts.toKebabCaseName("!!!")).isEqualTo("new-skill");
+        // 全连字符的输入在 trim 后也应回退到 fallback, 而不是返回空串.
+        assertThat(SkillQuickFixTexts.toKebabCaseName("----")).isEqualTo("new-skill");
+    }
+
+    @Test
+    void shouldTruncateToSpecificationLengthAndTrimDanglingHyphen() {
+        // 超过 64 字符时应截断, 且不能在截断处留下结尾连字符.
+        String value = "a".repeat(60) + " spaces here";
+        String result = SkillQuickFixTexts.toKebabCaseName(value);
+        assertThat(result).hasSizeLessThanOrEqualTo(64).doesNotEndWith("-");
+    }
+
+    @Test
+    void shouldRemoveHyphenLandingAtTruncationBoundary() {
+        // 让截断点正好落在替换出来的连字符上, 验证最后一次 trimHyphens 不漏处理.
+        String value = "a".repeat(63) + " bar";
+        String result = SkillQuickFixTexts.toKebabCaseName(value);
+        assertThat(result).isEqualTo("a".repeat(63)).doesNotEndWith("-");
+    }
+
+    @Test
+    void shouldStripFragmentAndQueryFromReferenceTarget() {
+        assertThat(SkillQuickFixTexts.stripFragmentAndQuery("references/guide.md")).isEqualTo("references/guide.md");
+        assertThat(SkillQuickFixTexts.stripFragmentAndQuery("references/guide.md#section")).isEqualTo("references/guide.md");
+        assertThat(SkillQuickFixTexts.stripFragmentAndQuery("references/guide.md?ts=1")).isEqualTo("references/guide.md");
+        assertThat(SkillQuickFixTexts.stripFragmentAndQuery("references/guide.md?ts=1#section")).isEqualTo("references/guide.md");
+        assertThat(SkillQuickFixTexts.stripFragmentAndQuery("#anchor-only")).isEmpty();
+    }
 }

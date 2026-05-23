@@ -22,5 +22,18 @@ public enum SkillFixType {
     ADD_DESCRIPTION,
 
     /** 将 frontmatter 中的 name 同步为父目录名 */
-    SYNC_NAME_WITH_DIRECTORY
+    SYNC_NAME_WITH_DIRECTORY,
+
+    /**
+     * 将不合规 name 自动转换为 kebab-case
+     * <p> 仅作用于 frontmatter.name 字段; 转换规则由 {@code SkillQuickFixTexts.toKebabCaseName} 实现.
+     */
+    CONVERT_NAME_TO_KEBAB,
+
+    /**
+     * 创建缺失的引用文件
+     * <p> 当 Markdown 相对链接指向的文件不存在时, 在 skill 目录内创建一个空文件,
+     * 并按需创建父目录. 不写入任何内容, 由作者后续手动补充, 保证修复保守.
+     */
+    CREATE_MISSING_REFERENCE
 }

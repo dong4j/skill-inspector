@@ -2,6 +2,7 @@ package dev.dong4j.idea.skill.inspector.rules;
 
 import com.intellij.openapi.util.TextRange;
 
+import dev.dong4j.idea.skill.inspector.model.SkillFixType;
 import dev.dong4j.idea.skill.inspector.model.SkillProblem;
 import dev.dong4j.idea.skill.inspector.model.SkillReference;
 
@@ -41,6 +42,10 @@ class ReferenceRulesTest {
         assertThat(problems)
             .extracting(SkillProblem::ruleId)
             .containsExactly("reference.missing-file");
+        // 缺失引用应附带"创建空文件"的保守修复, 让作者可以快速生成占位文件.
+        assertThat(problems)
+            .singleElement()
+            .satisfies(problem -> assertThat(problem.fixTypes()).containsExactly(SkillFixType.CREATE_MISSING_REFERENCE));
     }
 
     @Test
