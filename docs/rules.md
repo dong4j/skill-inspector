@@ -49,12 +49,14 @@
 
 | Rule ID                   | Severity | 说明                                                              |
 |---------------------------|----------|-----------------------------------------------------------------|
-| `reference.invalid-path`  | Warning  | Markdown 链接目标不是合法路径（`InvalidPathException`）                     |
-| `reference.missing-file`  | Warning  | 相对链接指向的文件不存在，附 `CREATE_MISSING_REFERENCE` 修复（创建空文件 + 父目录）      |
-| `reference.outside-skill` | Warning  | 引用路径 normalize 后跳出当前 skill 目录                                   |
-| `reference.case-mismatch` | Warning  | 在大小写不敏感的文件系统上，链接大小写与目录项不一致（防止迁移到 Linux 后失效）                    |
+| `reference.invalid-path`    | Warning | Markdown 链接目标不是合法路径（`InvalidPathException`）                  |
+| `reference.missing-file`    | Warning | 相对链接指向的文件不存在，附 `CREATE_MISSING_REFERENCE` 修复（创建空文件 + 父目录） |
+| `reference.outside-skill`   | Warning | 引用路径 normalize 后跳出当前 skill 目录                                |
+| `reference.case-mismatch`   | Warning | 在大小写不敏感的文件系统上，链接大小写与目录项不一致（防止迁移到 Linux 后失效）                 |
+| `resource.unused-reference` | Warning | `references/` 下的文件没被 SKILL.md 任何 Markdown 链接引用                |
+| `script.missing-usage`      | Warning | `scripts/` 下的脚本既没被链接引用、文件名也未出现在正文中                          |
 
-> 计划中：`resource.unused-reference`（`references/` 下未被引用的文件）、`script.missing-usage`（`scripts/` 下脚本未在正文说明用法）。
+引用规则按"链接 → 目标"方向，资源规则（`resource.*` / `script.*`）按"目标 → 是否被引用"反向，两者正交互补。所有规则都通过 `MarkdownReferenceParser` 复用同一个 PSI 解析结果，包括 inline link 与 reference-style 链接的 destination 节点。
 
 ## Security Rules
 

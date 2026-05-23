@@ -55,13 +55,13 @@ javaVersion=21
 ```text
 src/main/java/dev/dong4j/idea/skill/inspector/
 ├── PluginContents.java          # 插件常量
-├── action/                      # 用户交互入口（当前 SkillInspectorAction 仅触发占位通知）
+├── action/                      # 用户交互入口（SkillInspectorAction 扫描全项目 SKILL.md 并汇总结果）
 ├── detection/                   # Skill 文件检测（按文件名匹配 SKILL.md）
 ├── inspection/                  # LocalInspectionTool 适配层
 ├── model/                       # 领域模型 record（SkillFile / SkillFrontMatter / SkillMetadata 等）
 ├── parser/                      # Markdown PSI + YAML PSI 解析
 ├── quickfix/                    # Quick Fix 实现（SkillQuickFix + SkillQuickFixTexts）
-├── rules/                       # 检查规则（Structural / Quality / Reference / Security）
+├── rules/                       # 检查规则（Structural / Quality / Reference / Resource / Security）
 ├── settings/                    # 应用级设置 + Settings 页
 ├── statusbar/                   # 状态栏开关
 └── util/                        # 工具类
@@ -112,15 +112,17 @@ public record SkillFile(
 
 ## 文档结构
 
-| 文档                            | 用途                   | 维护者         |
-|-------------------------------|----------------------|-------------|
-| `README.md`                   | 项目愿景、规范基准、核心目标       | 全员          |
-| `docs/design.md`              | 领域模型、检查流程、模块划分       | 架构决策时更新     |
-| `docs/todo.md`                | MVP 功能清单、待办任务        | 任务完成时迁出     |
-| `docs/rules.md`               | 检查规则规范               | 规则变更时更新     |
-| `docs/roadmap.md`             | 版本路线、技术方向、产品定位       | 里程碑达成时更新    |
-| `docs/implementation-plan.md` | 当前实施优先级与多 Agent 协作计划 | 阶段任务推进时更新   |
-| `AGENTS.md`                   | 本文件，Agent 协作上下文      | 技术栈/规范变更时更新 |
+| 文档                            | 用途                              | 维护者         |
+|-------------------------------|---------------------------------|-------------|
+| `README.md`                   | 项目愿景、规范基准、核心目标                  | 全员          |
+| `docs/status.md`              | 阶段性状态总览 + 贯穿 V1-V5 的 TODO 勾选活文档 | 每阶段任务推进时更新  |
+| `docs/design.md`              | 领域模型、检查流程、模块划分                  | 架构决策时更新     |
+| `docs/todo.md`                | 已交付清单 + 未实现项                    | 任务完成时迁出     |
+| `docs/rules.md`               | 检查规则规范                          | 规则变更时更新     |
+| `docs/roadmap.md`             | 版本路线、技术方向、产品定位                  | 里程碑达成时更新    |
+| `docs/implementation-plan.md` | 当前实施优先级与多 Agent 协作计划            | 阶段任务推进时更新   |
+| `docs/ai-review.md`           | 二期 AI 审查方向：提示词参考、Provider 设计    | AI 集成阶段更新   |
+| `AGENTS.md`                   | 本文件，Agent 协作上下文                 | 技术栈/规范变更时更新 |
 
 ## 国际化 (i18n)
 
@@ -155,6 +157,8 @@ description.too-short
 description.missing-usage
 reference.missing-file
 reference.case-mismatch
+resource.unused-reference
+script.missing-usage
 security.dangerous-command
 ```
 
@@ -256,8 +260,15 @@ V1 默认走"单 Inspection + 多规则"路径，无需新增 Inspection 类：
 
 ### `SkillInspectorAction` 当前行为说明
 
-V1 中右键菜单的 `Validate Skill` Action 仍是占位：只检查项目 / 文件上下文，然后通过 `NotificationUtil.showInfo` 显示一条"已初始化"通知，**不**会执行 Inspection 或 Quick Fix。真正的检查能力依靠 `LocalInspectionTool`，会在用户打开 `SKILL.md` 时自动启用。后续会让 Action 一次性运行检查并把问题写入 Problems 面板。
+V1 收尾后，右键菜单的 `Validate Skill` Action 已经实化：
+
+1. 在后台 `Task.Backgroundable` 内通过 `FilenameIndex` 扫描项目里所有 `SKILL.md`。
+2. 对每个文件构建 `SkillFile` 并跑 `RuleRunner` 汇总 Error / Warning 数量。
+3. 对已打开的 SKILL.md 触发 `DaemonCodeAnalyzer.restart()`，让 Problems View 自动刷新。
+4. 弹出"扫描完毕"通知（带统计），自动激活 Problems View，并在存在 Error 时打开第一个有错的 SKILL.md。
+
+实时 Inspection 仍由 `SkillMdInspection`（`LocalInspectionTool`）承担，Action 与 Inspection 共用同一个 `RuleRunner`，结果一致。
 
 ---
 
-*最后更新: 2026-05-23 - 与实际代码对齐：补 statusbar/ 包、修正规则 ID 示例、更新规则与 Quick Fix 添加流程、说明 Action 占位行为*
+*最后更新: 2026-05-23 - V1 收尾：实化 SkillInspectorAction、补 ResourceRules（resource.unused-reference + script.missing-usage）、reference-style links 测试用例、状态栏图标交互精简*
