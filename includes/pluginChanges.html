@@ -1,0 +1,30 @@
+<div>
+    <h3>2026.1.1000</h3>
+    <h4>English</h4>
+    <ul>
+        <li>Added the first working <code>SKILL.md</code> inspection workflow for Agent Skill authoring.</li>
+        <li>Added YAML frontmatter validation for required <code>name</code> and <code>description</code> fields.</li>
+        <li>Added kebab-case validation and parent-directory consistency checks for skill names.</li>
+        <li>Added Markdown body quality hints, including title, usage-trigger, and length checks.</li>
+        <li>Added local Markdown reference checks for missing files, paths outside the skill directory, and path casing mismatches.</li>
+        <li>Added security hints for suspicious secrets, dangerous shell commands, broad <code>allowed-tools: Bash</code> permissions, sensitive local paths, and prompt-injection phrases.</li>
+        <li>Added Quick Fixes for deterministic structure issues: create frontmatter, add required fields, and synchronize <code>name</code> with the directory name.</li>
+        <li>Added a Settings page and Status Bar toggle to enable or disable <code>SKILL.md</code> inspections globally.</li>
+        <li>Added Markdown plugin dependency registration and fixed false positives for official Agent Skill examples that define usage triggers in frontmatter <code>description</code>.</li>
+        <li>Added unit tests for parsers, rules, Quick Fix text generation, settings, and the default rule runner.</li>
+    </ul>
+
+    <h4>中文</h4>
+    <ul>
+        <li>新增首个可用的 <code>SKILL.md</code> Inspection 流程，用于 Agent Skill 编写校验。</li>
+        <li>新增 YAML frontmatter 校验，覆盖必填字段 <code>name</code> 和 <code>description</code>。</li>
+        <li>新增 skill 名称 kebab-case 校验，以及与父目录名一致性检查。</li>
+        <li>新增 Markdown 正文质量提示，包括标题、使用时机和正文长度检查。</li>
+        <li>新增本地 Markdown 引用检查，覆盖缺失文件、跳出 skill 目录的路径和路径大小写不一致。</li>
+        <li>新增安全提示，覆盖疑似密钥、危险 shell 命令、过宽的 <code>allowed-tools: Bash</code> 权限、敏感本地路径和 prompt injection 文案。</li>
+        <li>新增针对确定性结构问题的 Quick Fix：创建 frontmatter、补齐必填字段、同步 <code>name</code> 为目录名。</li>
+        <li>新增 Settings 页面和 Status Bar 开关，用于全局启用或禁用 <code>SKILL.md</code> 检查。</li>
+        <li>补充 Markdown 插件依赖注册，并修复官方 Agent Skill 示例中使用时机写在 frontmatter <code>description</code> 时的误报。</li>
+        <li>新增 parser、规则、Quick Fix 文本生成、设置和默认规则执行器的单元测试。</li>
+    </ul>
+</div>

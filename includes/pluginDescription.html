@@ -1,0 +1,69 @@
+<h2>Skill Inspector</h2>
+<p>Skill Inspector brings IDE-grade feedback to Agent Skill authoring. It helps you write, review, and maintain <code>SKILL.md</code> files with the same kind of immediate validation you expect when working with code.</p>
+<p>Agent Skills are becoming a common way to package reusable instructions, scripts, references, and assets for AI coding agents. A small mistake in the frontmatter, a broken local reference, or an overly broad tool permission can make a skill harder to discover, harder to run, or riskier to share. Skill Inspector focuses on those authoring-time problems directly inside JetBrains IDEs.</p>
+<p>
+    <a href="https://github.com/dong4j/skill-inspector">GitHub</a> |
+    <a href="https://agentskills.io/specification">Agent Skills Specification</a>
+</p>
+
+<h3>What It Checks</h3>
+<p>The plugin uses the public Agent Skills specification as its default baseline, then adds practical authoring checks for the files and folders around a skill.</p>
+<ul>
+    <li><b>Skill structure</b>: validates YAML frontmatter, required fields, naming rules, and the relationship between the skill directory and frontmatter <code>name</code>.</li>
+    <li><b>Authoring quality</b>: highlights missing usage guidance, missing document structure, and skill files that are becoming too large for a lightweight entry point.</li>
+    <li><b>Local references</b>: checks relative Markdown links so referenced files, scripts, and assets do not silently break during editing or migration.</li>
+    <li><b>Safety signals</b>: flags suspicious secrets, dangerous command snippets, overly broad tool permissions, sensitive local paths, and prompt-injection style text.</li>
+    <li><b>Conservative Quick Fixes</b>: fixes deterministic structure issues such as missing frontmatter, missing required fields, and mismatched skill names.</li>
+</ul>
+
+<h3>Where It Helps</h3>
+<ul>
+    <li>Creating a new Agent Skill from scratch.</li>
+    <li>Reviewing a team skill before committing or publishing it.</li>
+    <li>Migrating skills between Claude Code, Codex, Cursor, Junie, Copilot, or other Agent Skill consumers.</li>
+    <li>Keeping local reference files, scripts, and assets connected to the main <code>SKILL.md</code>.</li>
+</ul>
+
+<h3>Design Approach</h3>
+<ul>
+    <li><b>Specification-first</b>: generic Agent Skills rules are treated as the default baseline instead of one vendor-specific dialect.</li>
+    <li><b>Low surprise</b>: warnings are intended to explain concrete authoring risks, not to enforce a single writing style.</li>
+    <li><b>Conservative fixes</b>: Quick Fixes repair structure but do not rewrite your instructions.</li>
+    <li><b>Local-first</b>: this version focuses on local IDE inspection, not remote registries or skill synchronization.</li>
+</ul>
+
+<hr/>
+
+<h2>Skill Inspector</h2>
+<p>Skill Inspector 为 Agent Skill 编写过程提供 IDE 级别的即时反馈，让 <code>SKILL.md</code> 像代码一样具备结构检查、问题提示和确定性修复能力。</p>
+<p>Agent Skills 正在成为 AI coding agent 复用指令、脚本、参考文档和资源文件的一种常见方式。frontmatter 的小错误、本地引用失效、工具权限过宽，都会让 skill 更难被发现、更难执行，甚至更不适合分享。Skill Inspector 专注解决这些发生在编写阶段的问题，并把反馈直接放在 JetBrains IDE 里。</p>
+<p>
+    <a href="https://github.com/dong4j/skill-inspector">GitHub</a> |
+    <a href="https://agentskills.io/specification">Agent Skills Specification</a>
+</p>
+
+<h3>检查内容</h3>
+<p>插件以公开的 Agent Skills specification 作为默认基准，并结合 skill 周边文件和目录结构做实际编写场景中的检查。</p>
+<ul>
+    <li><b>Skill 结构</b>：校验 YAML frontmatter、必填字段、命名规则，以及 skill 目录名和 frontmatter <code>name</code> 的一致性。</li>
+    <li><b>编写质量</b>：提示缺少使用说明、缺少文档结构，以及主 <code>SKILL.md</code> 过长等问题。</li>
+    <li><b>本地引用</b>：检查相对 Markdown 链接，避免参考文件、脚本和资源在编辑或迁移过程中悄悄失效。</li>
+    <li><b>安全信号</b>：提示疑似密钥、危险命令片段、过宽工具权限、敏感本地路径和 prompt injection 风格文本。</li>
+    <li><b>保守 Quick Fix</b>：只修复确定性的结构问题，例如缺少 frontmatter、缺少必填字段、skill 名称不一致。</li>
+</ul>
+
+<h3>适用场景</h3>
+<ul>
+    <li>从零创建新的 Agent Skill。</li>
+    <li>在提交或发布前审查团队维护的 skill。</li>
+    <li>在 Claude Code、Codex、Cursor、Junie、Copilot 或其他 Agent Skill 消费方之间迁移 skill。</li>
+    <li>维护 <code>SKILL.md</code> 与本地参考文件、脚本、资源文件之间的连接关系。</li>
+</ul>
+
+<h3>设计取向</h3>
+<ul>
+    <li><b>规范优先</b>：以通用 Agent Skills 规则作为默认基准，而不是绑定某个厂商的私有方言。</li>
+    <li><b>低打扰</b>：提示应说明具体编写风险，而不是强迫所有 skill 使用同一种写作风格。</li>
+    <li><b>保守修复</b>：Quick Fix 修复结构，不自动改写用户写下的指令内容。</li>
+    <li><b>本地优先</b>：当前版本聚焦 IDE 内本地检查，不包含远端 registry 或 skill 同步能力。</li>
+</ul>

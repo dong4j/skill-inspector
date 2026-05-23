@@ -23,6 +23,10 @@
 | 安全扫描             | 检查疑似 secret、危险命令和 prompt injection 文案 |
 | Quick Fix        | 自动补 frontmatter、修正 name、创建缺失引用文件      |
 
+## 二期功能
+
+- 考虑接入 AI 审查能力，让 AI 基于 Agent Skills specification 和项目内置规则检查 `SKILL.md` 的规范性，并给出可执行的优化建议。
+
 ## Quick Fix 方向
 
 - 创建缺失的 frontmatter。
