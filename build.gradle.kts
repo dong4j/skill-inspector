@@ -56,6 +56,8 @@ dependencies {
 
         // Bundled plugins
         bundledPlugin("com.intellij.java")
+        bundledPlugin("org.jetbrains.plugins.yaml")
+        bundledPlugin("org.intellij.plugins.markdown")
 
 
         // Marketplace ZIP Signer for plugin signing
