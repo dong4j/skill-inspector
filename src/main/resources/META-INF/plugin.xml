@@ -73,5 +73,13 @@
             <reference ref="dev.dong4j.idea.skill.inspector.action.SkillInspectorAction"/>
         </group>
     </actions>
+
+    <!-- 方案 B (对照实验): 编辑器右下角自定义 FAB 浮动按钮.
+         AppLifecycleListener 在 IDE 主窗口创建后挂载全局 EditorFactoryListener,
+         实现见 floating/SkillBottomFloatingInstaller. 与方案 A 同时启用, 方便对比效果. -->
+    <applicationListeners>
+        <listener class="dev.dong4j.idea.skill.inspector.floating.SkillBottomFloatingInstaller"
+                  topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
 </idea-plugin>
 

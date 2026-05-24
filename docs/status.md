@@ -12,7 +12,7 @@
 |----------------------------------------------------------|-----------------------------------|
 | V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关）        | ✅ 完成                              |
 | V1 收尾（2 条规则 + reference-style links + Action 实化）         | ✅ 完成（Inspection fixture 测试延后到 V2） |
-| V1 体验增强（编辑器浮动按钮 PoC）                                    | ✅ 完成（官方 FloatingToolbarProvider，右上角） |
+| V1 体验增强（编辑器浮动按钮 PoC 方案 A / B 双路并存）                       | ✅ 完成（A=官方右上角 / B=自定义右下角 FAB） |
 | V2 多 Agent Profile                                       | ⏳ 设计已就绪，未启动                       |
 | V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后                       |
 | AI 审查（二期）                                                | 📅 提示词模板已沉淀到 `ai-review.md`，待集成   |
@@ -88,9 +88,13 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 - [x] Markdown reference-style links 解析：PSI 递归遍历天然覆盖 `LINK_DEFINITION` 节点中的 `LINK_DESTINATION`，新增专门测试用例锁定行为
 - [x] `SkillInspectorAction` 实化：扫描全项目 SKILL.md → 跑 `RuleRunner` 汇总 Error/Warning → 激活 Problems View → 自动打开第一个有错的文件
 - [x] 为新规则、reference-style links、Action 补单元测试（测试总数 53 → 63）
-- [x] **编辑器浮动按钮 PoC**（`SkillFloatingToolbarProvider`）：复用 `SkillInspectorAction`，
+- [x] **编辑器浮动按钮 PoC 方案 A**（`SkillFloatingToolbarProvider`）：复用 `SkillInspectorAction`，
   挂在 IntelliJ 官方 `com.intellij.editorFloatingToolbarProvider` EP，仅在文件名为 `SKILL.md` 时显示，
-  位置由平台决定（右上角，鼠标悬停淡入）；如需"右下角"形态需另走自定义 `JLayeredPane` 路径
+  位置由平台决定（右上角，鼠标悬停淡入），与 IDE AI Assistant 风格一致
+- [x] **编辑器浮动按钮 PoC 方案 B**（`SkillBottomFloatingButton` + `SkillBottomFloatingInstaller`）：
+  自定义 36 dp 蓝色圆形 FAB，通过 `AppLifecycleListener` 挂全局 `EditorFactoryListener`，
+  把按钮放到编辑器外层 `JLayeredPane#PALETTE_LAYER`，**精确停在右下角**（带阴影 + 悬停加深），
+  与方案 A 同时启用，方便用户在沙箱里直接对比效果与权衡
 - [ ] Inspection fixture 测试：用 `CodeInsightTestFixture` 验证 `ProblemDescriptor` 注册与 Quick Fix 真实写入（**延后到 V2**，与 Profile 引入一并补）
 
 ### V2 多 Agent Profile — ⏳ 未开始
@@ -182,4 +186,4 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 
 ---
 
-最后更新：2026-05-25（新增编辑器浮动按钮 PoC）
+最后更新：2026-05-25（编辑器浮动按钮 PoC 方案 A / B 双路并存）

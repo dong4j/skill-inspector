@@ -272,6 +272,8 @@ V1 收尾后，右键菜单的 `Validate Skill` Action 已经实化：
 
 ---
 
-*最后更新: 2026-05-25 - V1 体验增强：新增 floating/ 包，引入官方 FloatingToolbarProvider PoC，SKILL.md 编辑器右上角悬停浮动按钮*
+*最后更新: 2026-05-25 - V1 体验增强：floating/ 包内新增方案 B（SkillBottomFloatingButton + SkillBottomFloatingInstaller），自定义右下角圆形 FAB 与方案 A 官方右上角浮动栏并存对比；PluginContents 抽出 ACTION_VALIDATE_SKILL_ID 常量供 floating 复用*
+
+*2026-05-25 - V1 体验增强：新增 floating/ 包，引入官方 FloatingToolbarProvider PoC（方案 A），SKILL.md 编辑器右上角悬停浮动按钮*
 
 *2026-05-23 - V1 收尾：实化 SkillInspectorAction、补 ResourceRules（resource.unused-reference + script.missing-usage）、reference-style links 测试用例、状态栏图标交互精简*
