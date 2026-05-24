@@ -21,11 +21,18 @@ public final class PluginContents {
     public static final String PLUGIN_NAME = "Skill Inspector";
 
     /**
-     * Validate Skill 动作的 ID, 必须与 plugin.xml 中 {@code <action id="..."/>} 保持一致.
-     * <p> 抽出常量是为了让 floating/ 等模块可以反查同一份 Action, 而不重复硬编码字符串.
+     * "校验项目全部 SKILL.md"动作的 ID, 必须与 plugin.xml 中 {@code <action id="..."/>} 保持一致.
+     * <p> 右键菜单 / 全局入口使用. 浮动按钮请使用 {@link #ACTION_VALIDATE_CURRENT_SKILL_ID}.
      */
     public static final String ACTION_VALIDATE_SKILL_ID =
         "dev.dong4j.idea.skill.inspector.action.SkillInspectorAction";
+
+    /**
+     * "仅校验当前 SKILL.md"动作的 ID. 专门给编辑器内浮动按钮使用 — 浮动按钮贴在某个 SKILL.md
+     * 编辑器上, 语义就是"校验这个文件", 不应该扫整个项目.
+     */
+    public static final String ACTION_VALIDATE_CURRENT_SKILL_ID =
+        "dev.dong4j.idea.skill.inspector.action.ValidateCurrentSkillFileAction";
 
     /**
      * 私有构造函数, 防止外部实例化

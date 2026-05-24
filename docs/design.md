@@ -136,7 +136,8 @@ public record SkillFrontMatter(
 
 ### 4.3 SkillMetadata
 
-`SkillMetadata` 是 specification 中显式定义字段的强类型视图，规则层通过它访问 `name`、`description`、`license`、`compatibility`、`metadata`、`allowed-tools`，避免规则散落字符串 key。
+`SkillMetadata` 是 specification 中显式定义字段的强类型视图，规则层通过它访问 `name`、`description`、`license`、`compatibility`、`metadata`、
+`allowed-tools`，避免规则散落字符串 key。
 
 ```java
 public record SkillMetadata(
@@ -179,7 +180,8 @@ public record SkillProblem(
 
 ### 4.6 SkillFixType / SkillSeverity
 
-- `SkillFixType`：当前共 6 种确定性修复 — `ADD_FRONT_MATTER`、`ADD_NAME`、`ADD_DESCRIPTION`、`SYNC_NAME_WITH_DIRECTORY`、`CONVERT_NAME_TO_KEBAB`、`CREATE_MISSING_REFERENCE`。
+- `SkillFixType`：当前共 6 种确定性修复 — `ADD_FRONT_MATTER`、`ADD_NAME`、`ADD_DESCRIPTION`、`SYNC_NAME_WITH_DIRECTORY`、`CONVERT_NAME_TO_KEBAB`、
+  `CREATE_MISSING_REFERENCE`。
 - `SkillSeverity`：`ERROR` / `WARNING` / `WEAK_WARNING`，由 `SkillMdInspection` 映射到 `ProblemHighlightType`。
 
 ## 5. 检查规则分层
@@ -192,43 +194,43 @@ public record SkillProblem(
 
 结构规则用于判断 skill 是否能被 Agent 正确识别。
 
-| Rule ID                              | Severity | 说明                                      |
-|--------------------------------------|----------|-----------------------------------------|
-| `skill.directory.name`               | Error    | 父目录名本身不符合 kebab-case                    |
-| `frontmatter.missing`                | Error    | 缺少 YAML frontmatter                     |
-| `frontmatter.invalid-yaml`           | Error    | frontmatter YAML 解析失败                   |
-| `frontmatter.name.missing`           | Error    | 缺少 `name`                               |
-| `frontmatter.name.too-long`          | Error    | `name` 超过 64 字符                         |
-| `frontmatter.name.invalid`           | Error    | `name` 不符合 kebab-case                   |
-| `frontmatter.name.mismatch`          | Error    | `name` 与父目录名不一致                         |
-| `frontmatter.description.missing`    | Error    | 缺少 `description`                        |
-| `frontmatter.description.too-long`   | Error    | `description` 超过 1024 字符                |
-| `frontmatter.compatibility.empty`    | Error    | 提供 `compatibility` 但内容为空                |
-| `frontmatter.compatibility.too-long` | Error    | `compatibility` 超过 500 字符               |
+| Rule ID                              | Severity | 说明                        |
+|--------------------------------------|----------|---------------------------|
+| `skill.directory.name`               | Error    | 父目录名本身不符合 kebab-case      |
+| `frontmatter.missing`                | Error    | 缺少 YAML frontmatter       |
+| `frontmatter.invalid-yaml`           | Error    | frontmatter YAML 解析失败     |
+| `frontmatter.name.missing`           | Error    | 缺少 `name`                 |
+| `frontmatter.name.too-long`          | Error    | `name` 超过 64 字符           |
+| `frontmatter.name.invalid`           | Error    | `name` 不符合 kebab-case     |
+| `frontmatter.name.mismatch`          | Error    | `name` 与父目录名不一致           |
+| `frontmatter.description.missing`    | Error    | 缺少 `description`          |
+| `frontmatter.description.too-long`   | Error    | `description` 超过 1024 字符  |
+| `frontmatter.compatibility.empty`    | Error    | 提供 `compatibility` 但内容为空  |
+| `frontmatter.compatibility.too-long` | Error    | `compatibility` 超过 500 字符 |
 
 ### 5.2 Quality Rules
 
 质量规则用于提高 skill 可用性，但不一定阻塞。
 
-| Rule ID                     | Severity     | 说明                         |
-|-----------------------------|--------------|----------------------------|
-| `description.too-short`     | Warning      | 描述过短（< 20 字符），可能无法帮助 Agent 发现 skill |
-| `description.too-generic`   | Warning      | 描述过泛，例如只写 `helper`、`tool`  |
+| Rule ID                     | Severity     | 说明                                          |
+|-----------------------------|--------------|---------------------------------------------|
+| `description.too-short`     | Warning      | 描述过短（< 20 字符），可能无法帮助 Agent 发现 skill         |
+| `description.too-generic`   | Warning      | 描述过泛，例如只写 `helper`、`tool`                   |
 | `description.missing-usage` | Warning      | description 未说明使用时机（缺 "use when"、"适用" 等触发语） |
-| `body.missing-title`        | Weak Warning | 正文缺少一级标题                   |
-| `body.missing-trigger`      | Warning      | 正文未说明何时使用                  |
-| `body.too-long`             | Warning      | 正文超过 12000 字符，建议拆分到 `references/` |
+| `body.missing-title`        | Weak Warning | 正文缺少一级标题                                    |
+| `body.missing-trigger`      | Warning      | 正文未说明何时使用                                   |
+| `body.too-long`             | Warning      | 正文超过 12000 字符，建议拆分到 `references/`           |
 
 ### 5.3 Reference Rules
 
 引用规则用于保证 skill 关联资源可访问。引用通过 Markdown PSI 提取 link destination 节点，规则在文件系统层校验存在性、目录边界和大小写。
 
-| Rule ID                   | Severity     | 说明                              |
-|---------------------------|--------------|---------------------------------|
-| `reference.invalid-path`  | Warning      | Markdown 链接目标不是合法路径             |
-| `reference.missing-file`  | Warning      | Markdown 相对链接指向的文件不存在            |
-| `reference.outside-skill` | Warning      | 引用路径跳出当前 skill 目录               |
-| `reference.case-mismatch` | Warning      | 路径大小写和文件系统不一致（防止迁移到 Linux 后失效） |
+| Rule ID                   | Severity | 说明                             |
+|---------------------------|----------|--------------------------------|
+| `reference.invalid-path`  | Warning  | Markdown 链接目标不是合法路径            |
+| `reference.missing-file`  | Warning  | Markdown 相对链接指向的文件不存在          |
+| `reference.outside-skill` | Warning  | 引用路径跳出当前 skill 目录              |
+| `reference.case-mismatch` | Warning  | 路径大小写和文件系统不一致（防止迁移到 Linux 后失效） |
 
 > 待实现：`resource.unused-reference`（`references/` 下未被引用的文件）、`script.missing-usage`（`scripts/` 下脚本未在正文说明用法）。
 
@@ -240,9 +242,9 @@ public record SkillProblem(
 |-------------------------------|----------|--------------------------------------------|
 | `security.secret-pattern`     | Error    | 疑似 token / password / secret / private key |
 | `security.dangerous-command`  | Error    | 出现 `rm -rf /`、`curl ... \| sh` 等危险命令       |
-| `security.allowed-tools-bash` | Warning  | `allowed-tools` 包含过宽的 `Bash` 权限             |
+| `security.allowed-tools-bash` | Warning  | `allowed-tools` 包含过宽的 `Bash` 权限            |
 | `security.sensitive-path`     | Warning  | 引导访问 `.ssh` / `.env` / `~/.aws`            |
-| `security.prompt-injection`   | Warning  | 出现 `ignore previous instructions` 等注入式文案  |
+| `security.prompt-injection`   | Warning  | 出现 `ignore previous instructions` 等注入式文案   |
 
 ## 6. 检查流程
 
@@ -314,11 +316,13 @@ PsiFile
 3. `ReferenceRules`：Markdown 引用。
 4. `SecurityRules`：secret / 危险命令 / `allowed-tools` / 敏感路径 / prompt injection。
 
-结构规则在 frontmatter 缺失或 YAML 解析失败时会提前 return，避免对依赖字段的后续检查产生噪音。其他规则若拿到 `parseError`，也会跳过依赖 metadata 字段的逻辑。
+结构规则在 frontmatter 缺失或 YAML 解析失败时会提前 return，避免对依赖字段的后续检查产生噪音。其他规则若拿到 `parseError`，也会跳过依赖
+metadata 字段的逻辑。
 
 ## 7. Quick Fix 策略
 
-Quick Fix 只处理确定性问题，对应 `SkillFixType` 枚举值；具体写入逻辑集中在 `quickfix/SkillQuickFix.java`，纯文本拼接放在 `SkillQuickFixTexts` 便于单元测试。
+Quick Fix 只处理确定性问题，对应 `SkillFixType` 枚举值；具体写入逻辑集中在 `quickfix/SkillQuickFix.java`，纯文本拼接放在 `SkillQuickFixTexts`
+便于单元测试。
 
 当前已实现的修复：
 

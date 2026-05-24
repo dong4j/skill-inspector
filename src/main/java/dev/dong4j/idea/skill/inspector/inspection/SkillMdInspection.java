@@ -5,6 +5,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiFile;
 
 import dev.dong4j.idea.skill.inspector.detection.SkillFileDetector;
@@ -23,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * SKILL.md Inspection
@@ -40,6 +43,9 @@ public class SkillMdInspection extends LocalInspectionTool {
 
     /** 默认规则执行器 */
     private final RuleRunner ruleRunner = new RuleRunner();
+
+    /** 诊断日志: 用于排查 IDE 是否对同一 PsiFile 多次调用 checkFile (导致 Problems View 出现重复) */
+    private static final Logger LOG = Logger.getInstance(SkillMdInspection.class);
 
     @Override
     @NotNull
@@ -64,6 +70,17 @@ public class SkillMdInspection extends LocalInspectionTool {
         return true;
     }
 
+    /**
+     * 声明这是 whole-file inspection, 强制 IDE 只调度一次 {@link #checkFile} 跑整个文件,
+     * 不要再走默认的 visitor 路径 (visitor 会按 PSI element 触发, 可能跟 checkFile 同时调度,
+     * 导致同一个 problem 被写入 Problems View 两次).
+     * <p>这是修掉"Problems View 所有 SKILL.md 警告精确重复 2 次"的根因.
+     */
+    @Override
+    public boolean runForWholeFile() {
+        return true;
+    }
+
     @Override
     @Nullable
     public ProblemDescriptor[] checkFile(@NotNull PsiFile file,
@@ -75,9 +92,22 @@ public class SkillMdInspection extends LocalInspectionTool {
 
         SkillFile skillFile = SkillModelBuilder.build(file);
         List<SkillProblem> problems = ruleRunner.run(skillFile);
-        List<ProblemDescriptor> descriptors = new ArrayList<>();
+        // 双重去重防御: RuleRunner 已按 ruleId+range 去重, 这里再用 ProblemDescriptor 维度 (ruleId+offsets) 去重一次,
+        // 防止 IDE 在同一 PSI 上多次触发 daemon highlighting pass 时, Problems View 累积出多条完全相同的条目.
+        Set<String> seen = new HashSet<>();
+        List<ProblemDescriptor> descriptors = new ArrayList<>(problems.size());
         for (SkillProblem problem : problems) {
+            String key = problem.ruleId() + "@" + problem.range().getStartOffset() + "-" + problem.range().getEndOffset();
+            if (!seen.add(key)) {
+                continue;
+            }
             descriptors.add(toDescriptor(file, manager, isOnTheFly, problem));
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SkillMdInspection.checkFile: file=" + file.getName()
+                + " onTheFly=" + isOnTheFly
+                + " rawProblems=" + problems.size()
+                + " uniqueDescriptors=" + descriptors.size());
         }
         return descriptors.toArray(ProblemDescriptor.EMPTY_ARRAY);
     }

@@ -7,6 +7,8 @@ import com.intellij.psi.PsiFileFactory;
 
 import dev.dong4j.idea.skill.inspector.model.SkillFrontMatter;
 
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
+
 import org.intellij.plugins.markdown.lang.MarkdownLanguage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -181,6 +183,61 @@ class FrontMatterParserTest {
     }
 
     /**
+     * 回归测试: 即使 Markdown PSI 没识别 FRONT_MATTER 节点 (用 PlainText 语言模拟),
+     * 纯文本 fallback 也必须能正确解析 frontmatter, 保证生产环境下 Inspection 与手动 Action 结果一致.
+     */
+    @Test
+    void shouldFallbackToTextParseWhenMarkdownPsiDoesNotRecognizeFrontMatter() {
+        String text = """
+            ---
+            name: slack-gif-creator
+            description: Knowledge and utilities for creating slack-style gifs.
+            ---
+            Some body without leading title.
+            """;
+
+        FrontMatterParseResult result = parsePlainText(text);
+
+        assertThat(result.frontMatter()).isNotNull();
+        SkillFrontMatter frontMatter = result.frontMatter();
+        assertThat(frontMatter.parseError()).isNull();
+        assertThat(frontMatter.values())
+            .containsEntry("name", "slack-gif-creator")
+            .containsEntry("description", "Knowledge and utilities for creating slack-style gifs.");
+        assertThat(result.body().text()).startsWith("Some body without leading title.");
+    }
+
+    /**
+     * 回归测试: 纯文本 fallback 也必须处理"缺闭合 ---"的场景, 报 parseError 而非彻底返回 null.
+     */
+    @Test
+    void shouldReportMissingClosingDelimiterInTextFallback() {
+        String text = """
+            ---
+            name: broken
+            description: missing closing
+            """;
+
+        FrontMatterParseResult result = parsePlainText(text);
+
+        assertThat(result.frontMatter()).isNotNull();
+        assertThat(result.frontMatter().parseError()).isEqualTo("Missing closing frontmatter delimiter");
+    }
+
+    /**
+     * 回归测试: 文本不以 --- 开头, fallback 必须返回 null frontMatter (而非误识别).
+     */
+    @Test
+    void shouldReturnNullFrontMatterWhenTextDoesNotStartWithDelimiterInFallback() {
+        String text = "# Title only\n\nbody";
+
+        FrontMatterParseResult result = parsePlainText(text);
+
+        assertThat(result.frontMatter()).isNull();
+        assertThat(result.body().text()).isEqualTo(text);
+    }
+
+    /**
      * 使用 Markdown 插件 PSI 创建测试文件, 覆盖生产路径解析逻辑。
      */
     private FrontMatterParseResult parse(String text) {
@@ -191,9 +248,26 @@ class FrontMatterParserTest {
     }
 
     /**
+     * 使用 PlainText 语言创建 PsiFile, 强制 Markdown PSI 识别失败, 触发纯文本 fallback 路径.
+     */
+    private FrontMatterParseResult parsePlainText(String text) {
+        Project project = PROJECT.getProject();
+        return ApplicationManager.getApplication().runReadAction((com.intellij.openapi.util.Computable<FrontMatterParseResult>) () ->
+            FrontMatterParser.parse(plainTextFile(project, text))
+        );
+    }
+
+    /**
      * 创建 Markdown PSI 测试文件。
      */
     private PsiFile markdownFile(Project project, String text) {
         return PsiFileFactory.getInstance(project).createFileFromText("SKILL.md", MarkdownLanguage.INSTANCE, text);
+    }
+
+    /**
+     * 创建 PlainText PSI 测试文件; 用于模拟"Markdown PSI 不可用"的极端环境.
+     */
+    private PsiFile plainTextFile(Project project, String text) {
+        return PsiFileFactory.getInstance(project).createFileFromText("SKILL.md", PlainTextLanguage.INSTANCE, text);
     }
 }

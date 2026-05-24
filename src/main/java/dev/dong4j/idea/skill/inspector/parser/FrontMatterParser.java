@@ -50,6 +50,15 @@ public final class FrontMatterParser {
     /**
      * 解析完整 {@code SKILL.md} PSI 文件
      *
+     * <p>双路径设计:
+     * <ol>
+     *   <li>优先用 JetBrains Markdown PSI 的 {@code FRONT_MATTER} 节点定位 frontmatter, 保留 PSI range 精度;</li>
+     *   <li>PSI 识别失败时回退到纯文本扫描. 这是关键: 实际 IDE 中观察到 daemon 早期跑 inspection 时
+     *       Markdown PSI 懒构建尚未完成, 或不同 Markdown plugin 版本对 frontmatter 节点命名/启用条件
+     *       不一致 (FRONT_MATTER / FRONTMATTER_HEADER / 未识别), 会导致同一份 SKILL.md 在
+     *       Inspection 和手动 Action 之间结果不一致. 纯文本扫描是确定性的, 消除该不一致.</li>
+     * </ol>
+     *
      * @param psiFile Markdown PSI 文件
      * @return frontmatter 和正文解析结果
      */
@@ -65,6 +74,11 @@ public final class FrontMatterParser {
             offsetAdjustment = 1;
         }
         if (frontMatterElement == null) {
+            // PSI 识别不到, 回退到纯文本扫描. 见方法 javadoc.
+            FrontMatterParseResult fallback = parseFromText(psiFile, text);
+            if (fallback != null) {
+                return fallback;
+            }
             return new FrontMatterParseResult(null, new SkillBody(text, 0, text.length()));
         }
 
@@ -92,6 +106,91 @@ public final class FrontMatterParser {
             frontMatter,
             new SkillBody(bodyText, bodyStartOffset, text.length())
         );
+    }
+
+    /**
+     * 不依赖 Markdown PSI 的纯文本 frontmatter 解析回退路径.
+     *
+     * <p>判定规则:
+     * <ul>
+     *   <li>文本(去掉可选 BOM)必须以 {@code ---} 开头, 且 {@code ---} 后紧跟换行或文件结束;</li>
+     *   <li>查找下一个**在行首**且独占一行的 {@code ---} 作为闭合分隔符;</li>
+     *   <li>找不到闭合分隔符时, 返回带 parseError 的 frontMatter (沿用现有"缺闭合"语义),
+     *       避免规则层把"明显是 frontmatter 但写错了"误判为"完全没 frontmatter".</li>
+     * </ul>
+     * YAML 内容部分仍走 {@link #parseYamlEntries}, 保留 YAML PSI 给出的 key/value 范围.
+     *
+     * @return 非 null 表示成功识别为 frontmatter 格式 (即使内部 YAML 有错); null 表示连分隔符都不匹配
+     */
+    private static FrontMatterParseResult parseFromText(@NotNull PsiFile psiFile, @NotNull String text) {
+        int bomOffset = text.startsWith("\uFEFF") ? 1 : 0;
+        int delim1Start = bomOffset;
+
+        if (!text.startsWith(DELIMITER, delim1Start)) {
+            return null;
+        }
+        int delim1End = delim1Start + DELIMITER.length();
+        if (delim1End < text.length() && text.charAt(delim1End) != '\n' && text.charAt(delim1End) != '\r') {
+            // `---xxxx` 这种不是 frontmatter 起始, 而可能是 thematic break + 文本
+            return null;
+        }
+
+        int contentStart = skipLineBreak(text, delim1End);
+        int delim2Start = findLineStartDelimiter(text, contentStart);
+        if (delim2Start < 0) {
+            TextRange range = TextRange.create(bomOffset, text.length());
+            SkillFrontMatter frontMatter = emptyFrontMatter(range, "Missing closing frontmatter delimiter");
+            return new FrontMatterParseResult(frontMatter, new SkillBody("", text.length(), text.length()));
+        }
+
+        int contentEnd = trimLineBreakBefore(text, delim2Start);
+        int delim2End = delim2Start + DELIMITER.length();
+
+        String yamlContent = text.substring(contentStart, contentEnd);
+        FrontMatterContent content = new FrontMatterContent(yamlContent, contentStart, contentEnd);
+
+        ParseEntriesResult entriesResult = parseYamlEntries(psiFile, content);
+        SkillFrontMatter frontMatter = new SkillFrontMatter(
+            delim1Start,
+            delim2End,
+            contentStart,
+            contentEnd,
+            entriesResult.values(),
+            entriesResult.entries(),
+            SkillMetadata.from(entriesResult.entries()),
+            entriesResult.parseError()
+        );
+        int bodyStartOffset = skipLineBreak(text, delim2End);
+        String bodyText = bodyStartOffset < text.length() ? text.substring(bodyStartOffset) : "";
+        return new FrontMatterParseResult(
+            frontMatter,
+            new SkillBody(bodyText, bodyStartOffset, text.length())
+        );
+    }
+
+    /**
+     * 在 text 中从 startOffset 开始, 查找下一个**在行首**且作为整行(后面紧跟换行/EOF)的 {@code ---}.
+     *
+     * <p>必须是整行: 避免把 {@code ---abc} 这种 thematic break 误当成 frontmatter 闭合.
+     *
+     * @return 找到的 {@code ---} 起始偏移; 未找到返回 -1
+     */
+    private static int findLineStartDelimiter(@NotNull String text, int startOffset) {
+        int searchFrom = startOffset;
+        while (searchFrom < text.length()) {
+            int idx = text.indexOf(DELIMITER, searchFrom);
+            if (idx < 0) {
+                return -1;
+            }
+            boolean atLineStart = (idx == 0) || text.charAt(idx - 1) == '\n' || text.charAt(idx - 1) == '\r';
+            int after = idx + DELIMITER.length();
+            boolean atLineEnd = (after >= text.length()) || text.charAt(after) == '\n' || text.charAt(after) == '\r';
+            if (atLineStart && atLineEnd) {
+                return idx;
+            }
+            searchFrom = idx + 1;
+        }
+        return -1;
     }
 
     /**

@@ -2,7 +2,8 @@
 
 本文档按"已完成 / 进行中 / 未开始"三段视图记录 Skill Inspector 的实施状态，方便多个 Agent 协作时快速接续。
 
-> 产品路线见 [`./roadmap.md`](./roadmap.md)，规则规范见 [`./rules.md`](./rules.md)，详细设计见 [`./design.md`](./design.md)，待办与剩余 Quick Fix 见 [`./todo.md`](./todo.md)。
+> 产品路线见 [`./roadmap.md`](./roadmap.md)，规则规范见 [`./rules.md`](./rules.md)，详细设计见 [`./design.md`](./design.md)，待办与剩余 Quick
+> Fix 见 [`./todo.md`](./todo.md)。
 
 ## 优先级原则
 
@@ -18,22 +19,30 @@
 - `SkillFileDetector` 仅根据文件名启用检查。
 - `FrontMatterParser` 使用 Markdown PSI + YAML PSI 解析 frontmatter，兼容 UTF-8 BOM 与块标量。
 - `SkillModelBuilder` 把 PSI 转换为规则层稳定模型（`SkillFile` / `SkillFrontMatter` / `SkillMetadata` / `SkillBody`）。
-- `StructuralRules`：`skill.directory.name` / `frontmatter.missing` / `frontmatter.invalid-yaml` / `frontmatter.name.missing` / `frontmatter.name.too-long` / `frontmatter.name.invalid` / `frontmatter.name.mismatch` / `frontmatter.description.missing` / `frontmatter.description.too-long` / `frontmatter.compatibility.empty` / `frontmatter.compatibility.too-long`。
-- `QualityRules`：`description.too-short` / `description.too-generic` / `description.missing-usage` / `body.missing-title` / `body.missing-trigger` / `body.too-long`。
-- `SecurityRules`：`security.secret-pattern` / `security.dangerous-command` / `security.allowed-tools-bash` / `security.sensitive-path` / `security.prompt-injection`。
+- `StructuralRules`：`skill.directory.name` / `frontmatter.missing` / `frontmatter.invalid-yaml` / `frontmatter.name.missing` /
+  `frontmatter.name.too-long` / `frontmatter.name.invalid` / `frontmatter.name.mismatch` / `frontmatter.description.missing` /
+  `frontmatter.description.too-long` / `frontmatter.compatibility.empty` / `frontmatter.compatibility.too-long`。
+- `QualityRules`：`description.too-short` / `description.too-generic` / `description.missing-usage` / `body.missing-title` /
+  `body.missing-trigger` / `body.too-long`。
+- `SecurityRules`：`security.secret-pattern` / `security.dangerous-command` / `security.allowed-tools-bash` / `security.sensitive-path` /
+  `security.prompt-injection`。
 - `SkillMdInspection` 适配层把 `SkillProblem` 映射为 `ProblemDescriptor` 并挂接 Quick Fix。
-- 保守 Quick Fix（6 种）：`ADD_FRONT_MATTER` / `ADD_NAME` / `ADD_DESCRIPTION` / `SYNC_NAME_WITH_DIRECTORY` / `CONVERT_NAME_TO_KEBAB` / `CREATE_MISSING_REFERENCE`。
+- 保守 Quick Fix（6 种）：`ADD_FRONT_MATTER` / `ADD_NAME` / `ADD_DESCRIPTION` / `SYNC_NAME_WITH_DIRECTORY` / `CONVERT_NAME_TO_KEBAB` /
+  `CREATE_MISSING_REFERENCE`。
 - 文本生成纯函数集中在 `SkillQuickFixTexts`（包含 `toKebabCaseName` / `stripFragmentAndQuery`），便于单元测试。
 
 ### Phase 2: Reference Rules ✅（基础版本）
 
-- `MarkdownReferenceParser` 复用 Markdown PSI `LINK_DESTINATION` 节点抽取链接目标，避免正则误判语法；inline link 与 reference-style 链接都通过递归遍历自动覆盖。
-- 规则覆盖 `reference.invalid-path` / `reference.missing-file` / `reference.outside-skill` / `reference.case-mismatch`，自动跳过 URL / 锚点 / 绝对路径 / `mailto:`。
+- `MarkdownReferenceParser` 复用 Markdown PSI `LINK_DESTINATION` 节点抽取链接目标，避免正则误判语法；inline link 与 reference-style
+  链接都通过递归遍历自动覆盖。
+- 规则覆盖 `reference.invalid-path` / `reference.missing-file` / `reference.outside-skill` / `reference.case-mismatch`，自动跳过 URL / 锚点 /
+  绝对路径 / `mailto:`。
 - 通过依赖注入支持单元测试：`ReferenceRules` 提供 `skillDirectoryResolver` + `referenceResolver` 构造函数。
 
 ### Phase 3: 单元测试覆盖 ✅（基础版本）
 
-- `FrontMatterParserTest`：有效 frontmatter、缺失 frontmatter、缺失 closing delimiter、不完整 YAML、引号值、UTF-8 BOM、嵌套 metadata、块标量 description。
+- `FrontMatterParserTest`：有效 frontmatter、缺失 frontmatter、缺失 closing delimiter、不完整 YAML、引号值、UTF-8 BOM、嵌套 metadata、块标量
+  description。
 - `MarkdownReferenceParserTest`：inline link / image link / 带 title 的链接 / 空目标 / reference-style link。
 - `StructuralRulesTest`：缺失 frontmatter、必填字段、非法 name、name 不匹配、name/description/compatibility 长度上限、有效结构。
 - `QualityRulesTest`：短描述、泛描述、缺触发语、缺正文标题、有效正文、官方 brand-guidelines 形态。
@@ -49,13 +58,15 @@
 
 - `SkillInspectorSettings`（应用级 `PersistentStateComponent`）只保存 `skillInspectionEnabled`。
 - `SkillInspectorConfigurable` 提供 `Settings | Tools | Skill Inspector` 入口。
-- `SkillInspectorStatusBarWidget` + `SkillInspectorStatusBarWidgetFactory` 提供状态栏快速切换；最终版采用 `IconPresentation` + `getClickConsumer`，单击图标直接切换并通过 `AllIcons.General.Inspections*` 两个图标做颜色对比。
+- `SkillInspectorStatusBarWidget` + `SkillInspectorStatusBarWidgetFactory` 提供状态栏快速切换；最终版采用 `IconPresentation` +
+  `getClickConsumer`，单击图标直接切换并通过 `AllIcons.General.Inspections*` 两个图标做颜色对比。
 
 ### Phase 5: V1 收尾 ✅
 
 - `ResourceRules`：新增 `resource.unused-reference` / `script.missing-usage` 两条规则，从"目录孤儿"反向出发，与 `ReferenceRules` 正交互补。
 - Markdown reference-style links：通过 PSI 递归遍历天然覆盖 `LINK_DEFINITION` 节点中的 `LINK_DESTINATION`，新增专门测试用例锁定行为。
-- `SkillInspectorAction` 实化：扫描项目里所有 `SKILL.md`，跑 `RuleRunner` 统计 Error / Warning，激活 Problems View 并自动打开第一个有错的文件。在后台 `Task.Backgroundable` 内执行，大项目下不阻塞 UI。
+- `SkillInspectorAction` 实化：扫描项目里所有 `SKILL.md`，跑 `RuleRunner` 统计 Error / Warning，激活 Problems View 并自动打开第一个有错的文件。在后台
+  `Task.Backgroundable` 内执行，大项目下不阻塞 UI。
 - 单元测试总数 63，覆盖 5 套规则 + parser + Quick Fix + settings + detector + RuleRunner。
 
 ## 进行中

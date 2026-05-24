@@ -178,14 +178,16 @@ public class SkillInspectorAction extends AnAction {
             summary.totalWarnings
         );
 
+        // 通知图标按汇总结果的最高严重度选择, 严格对应 IDE 内置 NotificationType:
+        //   有 error -> ERROR (红色 X), 仅 warning -> WARNING (黄色 !), 全干净 -> INFORMATION (蓝色 i)
         if (summary.totalErrors > 0 && summary.firstErrorFile != null) {
-            NotificationUtil.showWarning(project, message);
+            NotificationUtil.showError(project, message);
             // 自动把第一个有错的 SKILL.md 打到编辑器前台, 方便用户立刻处理.
             FileEditorManager.getInstance(project).openFile(summary.firstErrorFile, true);
         } else if (summary.totalErrors > 0) {
-            NotificationUtil.showWarning(project, message);
+            NotificationUtil.showError(project, message);
         } else if (summary.totalWarnings > 0) {
-            NotificationUtil.showInfo(project, message);
+            NotificationUtil.showWarning(project, message);
         } else {
             NotificationUtil.showInfo(project, message);
         }

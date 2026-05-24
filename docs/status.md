@@ -12,7 +12,7 @@
 |----------------------------------------------------------|-----------------------------------|
 | V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关）        | ✅ 完成                              |
 | V1 收尾（2 条规则 + reference-style links + Action 实化）         | ✅ 完成（Inspection fixture 测试延后到 V2） |
-| V1 体验增强（编辑器浮动按钮 PoC 方案 A / B 双路并存）                       | ✅ 完成（A=官方右上角 / B=自定义右下角 FAB） |
+| V1 体验增强（编辑器浮动按钮 PoC 方案 A / B 双路并存）                       | ✅ 完成（A=官方右上角 / B=自定义右下角 FAB）      |
 | V2 多 Agent Profile                                       | ⏳ 设计已就绪，未启动                       |
 | V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后                       |
 | AI 审查（二期）                                                | 📅 提示词模板已沉淀到 `ai-review.md`，待集成   |

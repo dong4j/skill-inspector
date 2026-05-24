@@ -60,17 +60,22 @@
 
     <!-- 插件定义的动作 -->
     <actions>
-        <!-- 编辑器右键菜单 -->
+        <!-- 编辑器右键菜单: 校验"项目里全部 SKILL.md", 适合批量验证 -->
         <action id="dev.dong4j.idea.skill.inspector.action.SkillInspectorAction"
                 class="dev.dong4j.idea.skill.inspector.action.SkillInspectorAction">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
 
-        <!-- 浮动工具栏使用的 ActionGroup, ID 与 SkillFloatingToolbarProvider#FLOATING_GROUP_ID 严格一致.
-             直接引用现有 SkillInspectorAction, 避免在右键菜单与浮动栏之间维护两份 Action 配置. -->
+        <!-- 浮动按钮 (方案 A / B) 共用: 只校验"DataContext 里的当前文件", 不扫全项目.
+             不挂任何菜单组, 仅供 floating/ 模块通过 ActionManager 取出后调用. -->
+        <action id="dev.dong4j.idea.skill.inspector.action.ValidateCurrentSkillFileAction"
+                class="dev.dong4j.idea.skill.inspector.action.ValidateCurrentSkillFileAction"/>
+
+        <!-- 浮动工具栏 (方案 A) 使用的 ActionGroup, ID 与 SkillFloatingToolbarProvider#FLOATING_GROUP_ID
+             严格一致. 引用 single-file 的 ValidateCurrentSkillFileAction, 与方案 B 浮动按钮保持同语义. -->
         <group id="dev.dong4j.idea.skill.inspector.SkillFloatingGroup"
                popup="false">
-            <reference ref="dev.dong4j.idea.skill.inspector.action.SkillInspectorAction"/>
+            <reference ref="dev.dong4j.idea.skill.inspector.action.ValidateCurrentSkillFileAction"/>
         </group>
     </actions>
 
