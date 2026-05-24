@@ -8,13 +8,13 @@
 
 ## 一、当前坐标
 
-| 维度 | 状态 |
-|------|------|
-| V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关） | ✅ 完成 |
-| V1 收尾（2 条规则 + reference-style links + Action 实化） | ✅ 完成（Inspection fixture 测试延后到 V2） |
-| V2 多 Agent Profile | ⏳ 设计已就绪，未启动 |
-| V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后 |
-| AI 审查（二期）| 📅 提示词模板已沉淀到 `ai-review.md`，待集成 |
+| 维度                                                       | 状态                                |
+|----------------------------------------------------------|-----------------------------------|
+| V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关）        | ✅ 完成                              |
+| V1 收尾（2 条规则 + reference-style links + Action 实化）         | ✅ 完成（Inspection fixture 测试延后到 V2） |
+| V2 多 Agent Profile                                       | ⏳ 设计已就绪，未启动                       |
+| V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后                       |
+| AI 审查（二期）                                                | 📅 提示词模板已沉淀到 `ai-review.md`，待集成   |
 
 ## 二、已实现 —— V1 MVP 全貌
 
@@ -26,18 +26,18 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 
 ### 2.1 模块清单（32 个 Java 源文件 + 11 个测试类）
 
-| 模块 | 落地能力 |
-|------|---------|
-| **检测入口** | `SkillFileDetector` 按文件名 `SKILL.md` 守门 |
-| **解析层** | Markdown PSI 定位 frontmatter → YAML PSI 解析键值；Markdown PSI 提取 `LINK_DESTINATION` |
-| **领域模型** | 9 个 record（`SkillFile` / `SkillFrontMatter` / `SkillMetadata` / `SkillBody` / `SkillYamlEntry` / `SkillReference` / `SkillProblem` / `SkillFixType` / `SkillSeverity`），零 IDE 依赖 |
-| **结构规则** | 11 条 Error，覆盖 frontmatter 必填、长度上限、kebab-case、name/目录一致性 |
-| **质量规则** | 6 条 Warning / Weak Warning，覆盖 description 与正文质量 |
-| **引用规则** | 4 条，相对链接缺失 / 越界 / 大小写 / 非法路径 |
-| **安全规则** | 5 条，secret / 危险命令 / 过宽 `allowed-tools` / 敏感路径 / prompt injection |
-| **Quick Fix** | 6 种确定性修复 |
-| **配置入口** | 应用级 `PersistentStateComponent` + Settings 页 + 状态栏（图标单击切换） |
-| **测试覆盖** | parser 8 类用例 / 四套 rules / RuleRunner / Quick Fix 文本 / settings / detector |
+| 模块            | 落地能力                                                                                                                                                                            |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **检测入口**      | `SkillFileDetector` 按文件名 `SKILL.md` 守门                                                                                                                                          |
+| **解析层**       | Markdown PSI 定位 frontmatter → YAML PSI 解析键值；Markdown PSI 提取 `LINK_DESTINATION`                                                                                                  |
+| **领域模型**      | 9 个 record（`SkillFile` / `SkillFrontMatter` / `SkillMetadata` / `SkillBody` / `SkillYamlEntry` / `SkillReference` / `SkillProblem` / `SkillFixType` / `SkillSeverity`），零 IDE 依赖 |
+| **结构规则**      | 11 条 Error，覆盖 frontmatter 必填、长度上限、kebab-case、name/目录一致性                                                                                                                         |
+| **质量规则**      | 6 条 Warning / Weak Warning，覆盖 description 与正文质量                                                                                                                                 |
+| **引用规则**      | 4 条，相对链接缺失 / 越界 / 大小写 / 非法路径                                                                                                                                                    |
+| **安全规则**      | 5 条，secret / 危险命令 / 过宽 `allowed-tools` / 敏感路径 / prompt injection                                                                                                                |
+| **Quick Fix** | 6 种确定性修复                                                                                                                                                                        |
+| **配置入口**      | 应用级 `PersistentStateComponent` + Settings 页 + 状态栏（图标单击切换）                                                                                                                       |
+| **测试覆盖**      | parser 8 类用例 / 四套 rules / RuleRunner / Quick Fix 文本 / settings / detector                                                                                                       |
 
 ### 2.2 关键架构决策（值得长期保持）
 
@@ -52,7 +52,8 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
    YAML frontmatter 走 Markdown PSI + YAML PSI 双重解析；Markdown 链接走 `LINK_DESTINATION` 节点。避免代码块 / HTML 注释里的伪结构污染。
 
 3. **Quick Fix 枚举派发，避免 Fix 类爆炸**
-   `SkillProblem.fixTypes` (`List<SkillFixType>`) → 单一 `SkillQuickFix` 派发 → 文本生成集中在 `SkillQuickFixTexts`。规则层不直接 new IntelliJ 对象。
+   `SkillProblem.fixTypes` (`List<SkillFixType>`) → 单一 `SkillQuickFix` 派发 → 文本生成集中在 `SkillQuickFixTexts`。规则层不直接 new
+   IntelliJ 对象。
 
 4. **配置入口收敛**
    应用级 `skillInspectionEnabled` 一个开关 → Settings 页和状态栏共用同一份状态 → 关闭即整个 Inspection 短路返回。
@@ -156,17 +157,17 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 
 ## 四、文档健康度审计
 
-| 文档 | 状态 | 备注 |
-|------|------|------|
-| `README.md` | ✅ 对齐 | 项目愿景与规范基准 |
-| `AGENTS.md` | ✅ 对齐 | V1 收尾时已更新：Action 行为说明、ResourceRules 包结构、status.md / ai-review.md 文档表 |
-| `docs/design.md` | ✅ 对齐 | 领域模型 + 模块划分与代码一致 |
-| `docs/rules.md` | ✅ 对齐 | 新增 `resource.unused-reference` / `script.missing-usage` 两行，删除"计划中"提示 |
-| `docs/todo.md` | ✅ 对齐 | 把已交付项纳入"已交付能力"清单，删除"待实现规则"段，"待实现 Quick Fix"仅留明确不做项 |
-| `docs/roadmap.md` | ✅ 对齐 | V1-V5 路线清晰 |
-| `docs/implementation-plan.md` | ✅ 对齐 | 新增 Phase 5 "V1 收尾"段，"未开始"清单清掉过时项 |
-| `docs/status.md` | ✅ 本文件 | 活文档，每阶段更新 |
-| `docs/ai-review.md` | ✅ 新增 | 沉淀 microsoft 项目提示词参考 |
+| 文档                            | 状态    | 备注                                                                   |
+|-------------------------------|-------|----------------------------------------------------------------------|
+| `README.md`                   | ✅ 对齐  | 项目愿景与规范基准                                                            |
+| `AGENTS.md`                   | ✅ 对齐  | V1 收尾时已更新：Action 行为说明、ResourceRules 包结构、status.md / ai-review.md 文档表 |
+| `docs/design.md`              | ✅ 对齐  | 领域模型 + 模块划分与代码一致                                                     |
+| `docs/rules.md`               | ✅ 对齐  | 新增 `resource.unused-reference` / `script.missing-usage` 两行，删除"计划中"提示 |
+| `docs/todo.md`                | ✅ 对齐  | 把已交付项纳入"已交付能力"清单，删除"待实现规则"段，"待实现 Quick Fix"仅留明确不做项                   |
+| `docs/roadmap.md`             | ✅ 对齐  | V1-V5 路线清晰                                                           |
+| `docs/implementation-plan.md` | ✅ 对齐  | 新增 Phase 5 "V1 收尾"段，"未开始"清单清掉过时项                                     |
+| `docs/status.md`              | ✅ 本文件 | 活文档，每阶段更新                                                            |
+| `docs/ai-review.md`           | ✅ 新增  | 沉淀 microsoft 项目提示词参考                                                 |
 
 ## 五、下一步动作
 
