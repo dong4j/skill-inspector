@@ -52,7 +52,10 @@ intellijPlatform {
 dependencies {
     // IntelliJ Platform
     intellijPlatform {
+        // 社区版
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        // 2026 使用
+        // intellijIdea(providers.gradleProperty("platformVersion"))
 
         // Bundled plugins
         bundledPlugin("com.intellij.java")
