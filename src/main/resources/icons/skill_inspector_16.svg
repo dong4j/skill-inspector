@@ -1,6 +1,28 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="16" height="16" rx="2" fill="#4a63d4"/>
-    <path d="M4 4h8v8H4z" fill="#ffffff" opacity="0.2"/>
-    <path d="M6 6h4v4H6z" fill="#ffffff"/>
-</svg>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skill Inspector 16x16 icon">
+    <defs>
+        <linearGradient id="doc" x1="3" y1="1.5" x2="12" y2="14" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#F8FBFF"/>
+            <stop offset="1" stop-color="#BFD3EA"/>
+        </linearGradient>
+        <linearGradient id="badge" x1="7" y1="7" x2="14" y2="14" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#38BDF8"/>
+            <stop offset="1" stop-color="#2563EB"/>
+        </linearGradient>
+    </defs>
 
+    <!-- SKILL.md document -->
+    <path d="M3 1.5h7l3 3V14c0 .3-.2.5-.5.5h-9A.5.5 0 0 1 3 14V2c0-.3.2-.5.5-.5Z"
+          fill="url(#doc)" stroke="#334155" stroke-width="1"/>
+    <path d="M10 1.8V4c0 .3.2.5.5.5h2.2L10 1.8Z"
+          fill="#EAF3FF" stroke="#334155" stroke-width=".7" stroke-linejoin="round"/>
+
+    <!-- compact markdown lines -->
+    <rect x="4.5" y="5.2" width="4.5" height="1.2" rx=".6" fill="#2563EB"/>
+    <rect x="4.5" y="7.6" width="5.6" height="1" rx=".5" fill="#64748B" opacity=".85"/>
+    <rect x="4.5" y="9.7" width="3.7" height="1" rx=".5" fill="#64748B" opacity=".65"/>
+
+    <!-- inspection / validation badge -->
+    <circle cx="10.7" cy="10.9" r="3.8" fill="url(#badge)" stroke="#0F172A" stroke-width=".9"/>
+    <path d="M8.8 10.9l1.2 1.2 2.6-2.8"
+          fill="none" stroke="#A7F3D0" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
