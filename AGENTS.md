@@ -57,6 +57,7 @@ src/main/java/dev/dong4j/idea/skill/inspector/
 ├── PluginContents.java          # 插件常量
 ├── action/                      # 用户交互入口（SkillInspectorAction 扫描全项目 SKILL.md 并汇总结果）
 ├── detection/                   # Skill 文件检测（按文件名匹配 SKILL.md）
+├── floating/                    # 编辑器内浮动按钮（FloatingToolbarProvider 实现）
 ├── inspection/                  # LocalInspectionTool 适配层
 ├── model/                       # 领域模型 record（SkillFile / SkillFrontMatter / SkillMetadata 等）
 ├── parser/                      # Markdown PSI + YAML PSI 解析
@@ -271,4 +272,6 @@ V1 收尾后，右键菜单的 `Validate Skill` Action 已经实化：
 
 ---
 
-*最后更新: 2026-05-23 - V1 收尾：实化 SkillInspectorAction、补 ResourceRules（resource.unused-reference + script.missing-usage）、reference-style links 测试用例、状态栏图标交互精简*
+*最后更新: 2026-05-25 - V1 体验增强：新增 floating/ 包，引入官方 FloatingToolbarProvider PoC，SKILL.md 编辑器右上角悬停浮动按钮*
+
+*2026-05-23 - V1 收尾：实化 SkillInspectorAction、补 ResourceRules（resource.unused-reference + script.missing-usage）、reference-style links 测试用例、状态栏图标交互精简*
