@@ -1,14 +1,14 @@
 package dev.dong4j.idea.skill.inspector.rules;
 
-import dev.dong4j.idea.skill.inspector.model.SkillFile;
-import dev.dong4j.idea.skill.inspector.model.SkillProblem;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import dev.dong4j.idea.skill.inspector.model.SkillFile;
+import dev.dong4j.idea.skill.inspector.model.SkillProblem;
 
 /**
  * Skill 规则执行器
@@ -36,7 +36,7 @@ public class RuleRunner {
             new ReferenceRules(),
             new ResourceRules(),
             new SecurityRules()
-        ));
+                    ));
     }
 
     /**
@@ -59,8 +59,23 @@ public class RuleRunner {
         List<SkillProblem> problems = new ArrayList<>();
         for (SkillRule rule : rules) {
             problems.addAll(rule.check(skillFile));
+            if (hasFatalFrontMatterProblem(problems)) {
+                break;
+            }
         }
         return deduplicate(problems);
+    }
+
+    /**
+     * 判断是否已经命中 frontmatter 致命结构问题.
+     * <p>缺少 frontmatter 或 frontmatter 本身解析失败时, 继续执行正文质量、引用、资源和安全规则
+     * 会产生大量派生噪音。例如缺闭合分隔符会让 body 为空, 继而触发 body.missing-title /
+     * body.missing-trigger。这里按 docs/design.md 的约定提前停止后续规则.
+     */
+    private static boolean hasFatalFrontMatterProblem(@NotNull List<SkillProblem> problems) {
+        return problems.stream()
+            .map(SkillProblem::ruleId)
+            .anyMatch(ruleId -> ruleId.equals("frontmatter.missing") || ruleId.equals("frontmatter.invalid-yaml"));
     }
 
     /**

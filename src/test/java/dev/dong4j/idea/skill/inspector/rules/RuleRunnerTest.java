@@ -1,10 +1,10 @@
 package dev.dong4j.idea.skill.inspector.rules;
 
-import dev.dong4j.idea.skill.inspector.model.SkillProblem;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import dev.dong4j.idea.skill.inspector.model.SkillProblem;
 
 import static dev.dong4j.idea.skill.inspector.test.SkillFileTestFactory.skillFile;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ class RuleRunnerTest {
                 "body.missing-title",
                 "body.missing-trigger",
                 "security.allowed-tools-bash"
-            );
+                     );
     }
 
     @Test
@@ -56,7 +56,7 @@ class RuleRunnerTest {
             license: Complete terms in LICENSE.txt
             ---
             # Anthropic Brand Styling
-
+            
             ## Overview
             Brand styling guidance.
             """;
@@ -71,7 +71,7 @@ class RuleRunnerTest {
                 "frontmatter.description.missing",
                 "body.missing-title",
                 "body.missing-trigger"
-            );
+                           );
     }
 
     @Test
@@ -90,5 +90,20 @@ class RuleRunnerTest {
         assertThat(problems)
             .extracting(SkillProblem::ruleId)
             .contains("frontmatter.description.too-long");
+    }
+
+    @Test
+    void shouldStopAfterFatalFrontMatterProblem() {
+        String text = """
+            ---
+            name: broken-skill
+            description: Use this skill when validating broken frontmatter.
+            """;
+
+        List<SkillProblem> problems = new RuleRunner().run(skillFile(text, "broken-skill"));
+
+        assertThat(problems)
+            .extracting(SkillProblem::ruleId)
+            .containsExactly("frontmatter.invalid-yaml");
     }
 }
