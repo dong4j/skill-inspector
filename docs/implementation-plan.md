@@ -50,16 +50,18 @@
 - `ResourceRulesTest`：未使用资源、嵌套未使用资源、脚本无用法、脚本通过链接 / 文件名提及视为已用、未提供目录时跳过、URL/锚点不算引用。
 - `SecurityRulesTest`：secret、危险命令、Bash 权限、敏感路径、prompt injection。
 - `RuleRunnerTest`：默认规则集合接入、官方样例不误报、specification 违例端到端命中。
+- `SkillFixturesRuleRunnerTest`：遍历 `src/test/resources/fixtures/skills`，用期望 `ruleId` 文件锁定规则样例。
+- `SkillInspectionDuplicateGuardTest`：锁定同一 PSI 访问路径下的重复诊断去重行为。
 - `SkillQuickFixTextsTest`：frontmatter 模板、字段插入换行、目录名 fallback。
 - `SkillInspectorSettingsTest`：默认值、修改、状态恢复。
 - `SkillFileDetectorTest`：文件名匹配。
 
-### Phase 4: 设置入口与状态栏开关 ✅
+### Phase 4: 设置入口与状态栏计数 ✅
 
 - `SkillInspectorSettings`（应用级 `PersistentStateComponent`）只保存 `skillInspectionEnabled`。
 - `SkillInspectorConfigurable` 提供 `Settings | Tools | Skill Inspector` 入口。
-- `SkillInspectorStatusBarWidget` + `SkillInspectorStatusBarWidgetFactory` 提供状态栏快速切换；最终版采用 `IconPresentation` +
-  `getClickConsumer`，单击图标直接切换并通过 `AllIcons.General.Inspections*` 两个图标做颜色对比。
+- `SkillInspectorStatusBarWidget` + `SkillInspectorStatusBarWidgetFactory` 提供当前文件问题计数；
+  `SKILL.md` 显示 `xE/yW`，非 `SKILL.md` 显示 `N/A`。启停检查交给 Settings 与 IDE Power Save Mode。
 
 ### Phase 5: V1 收尾 ✅
 
@@ -67,7 +69,7 @@
 - Markdown reference-style links：通过 PSI 递归遍历天然覆盖 `LINK_DEFINITION` 节点中的 `LINK_DESTINATION`，新增专门测试用例锁定行为。
 - `SkillInspectorAction` 实化：扫描项目里所有 `SKILL.md`，跑 `RuleRunner` 统计 Error / Warning，激活 Problems View 并自动打开第一个有错的文件。在后台
   `Task.Backgroundable` 内执行，大项目下不阻塞 UI。
-- 单元测试总数 63，覆盖 5 套规则 + parser + Quick Fix + settings + detector + RuleRunner。
+- 单元测试当前 72 个 `@Test`，覆盖 5 套规则 + parser + Quick Fix + settings + detector + RuleRunner + duplicate guard + fixture 规则期望。
 
 ## 进行中
 
@@ -81,7 +83,7 @@
 - 规则严重度覆盖、自定义阈值（最大正文长度等）。
 - 安全扫描独立开关。
 
-### Inspection Fixture 测试（延后到 V2，与 Profile 一起补）
+### IDE Fixture 测试（延后到 V2，与 Profile 一起补）
 
 - 真正启动 IntelliJ fixture，验证 `SkillMdInspection` 注册 `ProblemDescriptor`。
 - 验证 `LocalQuickFix.applyFix` 实际改写文档内容。
@@ -93,7 +95,6 @@
 - Live Template / Postfix 补全：`skill-meta`、`skill-section` 等。
 - Intention：Rename Skill（同步重命名父目录 + name）。
 - Inspection 抑制注释：支持 `<!-- noinspection ruleId -->` 行级抑制。
-- 状态栏图标问题角标：SKILL.md 有 N 个 Error 时显示数字角标。
 - Quick Fix Preview：接入 `LocalQuickFix.generatePreview`。
 
 ### Quick Fix 增强（明确不做）

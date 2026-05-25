@@ -186,7 +186,7 @@ public record SkillProblem(
 
 ## 5. 检查规则分层
 
-规则按确定性和风险分为四层。下表中的 ID 与代码中 `SkillProblem.ruleId` 一一对应，以代码为准。
+规则按确定性和风险分为五层。下表中的 ID 与代码中 `SkillProblem.ruleId` 一一对应，以代码为准。
 
 > 文件名检查 (`SKILL.md`) 不作为可上报规则，而是 `SkillFileDetector` 的入口门控，未命中文件名时整个 Inspection 直接跳过。
 
@@ -232,9 +232,16 @@ public record SkillProblem(
 | `reference.outside-skill` | Warning  | 引用路径跳出当前 skill 目录              |
 | `reference.case-mismatch` | Warning  | 路径大小写和文件系统不一致（防止迁移到 Linux 后失效） |
 
-> 待实现：`resource.unused-reference`（`references/` 下未被引用的文件）、`script.missing-usage`（`scripts/` 下脚本未在正文说明用法）。
+### 5.4 Resource Rules
 
-### 5.4 Security Rules
+资源规则从 skill 目录中的文件反向检查它们是否被 `SKILL.md` 使用或说明，和 Reference Rules 的"链接 → 目标"方向互补。
+
+| Rule ID                     | Severity | 说明                                   |
+|-----------------------------|----------|--------------------------------------|
+| `resource.unused-reference` | Warning  | `references/` 下的文件未被 `SKILL.md` 链接引用 |
+| `script.missing-usage`      | Warning  | `scripts/` 下的脚本既未被链接，也未在正文中提及        |
+
+### 5.5 Security Rules
 
 安全规则用于发现高风险内容。V1 只定位和提示，不自动改写。
 
@@ -256,7 +263,7 @@ PsiFile
   -> FrontMatterParser
   -> SkillModelBuilder
   -> RuleRunner
-  -> ProblemDescriptorMapper
+  -> SkillInspectionProblemMapper
   -> IntelliJ Problems
 ```
 
@@ -314,7 +321,8 @@ PsiFile
 1. `StructuralRules`：frontmatter 必填字段、长度和命名规范。
 2. `QualityRules`：description 和正文质量。
 3. `ReferenceRules`：Markdown 引用。
-4. `SecurityRules`：secret / 危险命令 / `allowed-tools` / 敏感路径 / prompt injection。
+4. `ResourceRules`：`references/` 与 `scripts/` 的反向使用检查。
+5. `SecurityRules`：secret / 危险命令 / `allowed-tools` / 敏感路径 / prompt injection。
 
 结构规则在 frontmatter 缺失或 YAML 解析失败时会提前 return，避免对依赖字段的后续检查产生噪音。其他规则若拿到 `parseError`，也会跳过依赖
 metadata 字段的逻辑。
@@ -352,7 +360,7 @@ Skill Inspector
 ```
 
 - 设置页 `SkillInspectorConfigurable` 提供一个复选框。
-- 状态栏 `SkillInspectorStatusBarWidget` 提供同一开关的快速切换，避免设置入口分散。
+- 状态栏 `SkillInspectorStatusBarWidget` 展示当前文件的 Error / Warning 计数；非 `SKILL.md` 文件显示 `N/A`。
 - 关闭开关时 `SkillMdInspection` 直接返回空问题数组，跳过所有规则。
 
 未实现（计划见 `docs/roadmap.md` V2/V4）：
@@ -370,11 +378,18 @@ Skill Inspector
 src/main/java/dev/dong4j/idea/skill/inspector/
 ├── PluginContents.java                # 插件标识常量
 ├── action/
-│   └── SkillInspectorAction.java      # 右键菜单入口（V1 占位通知，未接入完整 Inspection）
+│   ├── SkillInspectorAction.java      # 右键菜单入口：扫描项目里全部 SKILL.md
+│   └── ValidateCurrentSkillFileAction.java # 浮动按钮入口：只校验当前 SKILL.md
 ├── detection/
 │   └── SkillFileDetector.java         # 仅根据文件名 SKILL.md 决定是否启用 Inspection
+├── floating/
+│   ├── SkillBottomFloatingButton.java # 编辑器右下角自定义浮动按钮
+│   └── SkillBottomFloatingInstaller.java # IDE 启动后为 SKILL.md 编辑器挂载按钮
 ├── inspection/
-│   └── SkillMdInspection.java         # LocalInspectionTool 适配层
+│   ├── SkillInspectionDuplicateGuard.java # Problems View 重复诊断保护
+│   ├── SkillInspectionProblemMapper.java  # SkillProblem 到 ProblemDescriptor 的映射
+│   ├── SkillMdInspection.java             # LocalInspectionTool 适配层
+│   └── SkillProblemKey.java               # 诊断去重键
 ├── model/
 │   ├── SkillFile.java
 │   ├── SkillFrontMatter.java
@@ -399,6 +414,7 @@ src/main/java/dev/dong4j/idea/skill/inspector/
 │   ├── StructuralRules.java
 │   ├── QualityRules.java
 │   ├── ReferenceRules.java
+│   ├── ResourceRules.java
 │   └── SecurityRules.java
 ├── settings/
 │   ├── SkillInspectorSettings.java    # 应用级 PersistentStateComponent
@@ -428,7 +444,8 @@ V1 应优先覆盖规则测试，而不是 UI 测试。
 - Parser tests：frontmatter 有效、缺失、YAML 错误、空 body。
 - Rule tests：每条规则至少一个 positive 和 negative case。
 - Quick Fix tests：验证修复后的文档内容。
-- Inspection tests：验证 IntelliJ fixture 能正确注册问题。
+- Fixture rule tests：遍历 `src/test/resources/fixtures/skills`，锁定每个样例期望命中的 `ruleId`。
+- IDE fixture tests（V2）：验证 IntelliJ fixture 能正确注册问题和应用 Quick Fix。
 
 关键样例：
 

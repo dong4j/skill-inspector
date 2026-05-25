@@ -1,69 +1,99 @@
 <h2>Skill Inspector</h2>
-<p>Skill Inspector brings IDE-grade feedback to Agent Skill authoring. It helps you write, review, and maintain <code>SKILL.md</code> files with the same kind of immediate validation you expect when working with code.</p>
-<p>Agent Skills are becoming a common way to package reusable instructions, scripts, references, and assets for AI coding agents. A small mistake in the frontmatter, a broken local reference, or an overly broad tool permission can make a skill harder to discover, harder to run, or riskier to share. Skill Inspector focuses on those authoring-time problems directly inside JetBrains IDEs.</p>
+<p>Skill Inspector is a JetBrains IDE plugin for writing and reviewing Agent Skills. It brings real-time inspection, problem navigation,
+    and conservative Quick Fixes to <code>SKILL.md</code> files, so skill authors can catch structure, reference, quality, and safety issues
+    while editing.</p>
+<p>Agent Skills package reusable instructions, scripts, references, and assets for AI coding agents. A broken frontmatter block, a missing
+    local reference, or an overly broad tool permission can make a skill harder to discover, harder to run, or unsafe to share. Skill
+    Inspector focuses on those authoring-time problems directly inside JetBrains IDEs.</p>
 <p>
     <a href="https://github.com/dong4j/skill-inspector">GitHub</a> |
-    <a href="https://agentskills.io/specification">Agent Skills Specification</a>
+    <a href="https://agentskills.io/specification">Agent Skills Specification</a> |
+    <a href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e">More plugins</a>
 </p>
 
-<h3>What It Checks</h3>
-<p>The plugin uses the public Agent Skills specification as its default baseline, then adds practical authoring checks for the files and folders around a skill.</p>
+<h3>Core Capabilities</h3>
 <ul>
-    <li><b>Skill structure</b>: validates YAML frontmatter, required fields, naming rules, and the relationship between the skill directory and frontmatter <code>name</code>.</li>
-    <li><b>Authoring quality</b>: highlights missing usage guidance, missing document structure, and skill files that are becoming too large for a lightweight entry point.</li>
-    <li><b>Local references</b>: checks relative Markdown links so referenced files, scripts, and assets do not silently break during editing or migration.</li>
-    <li><b>Safety signals</b>: flags suspicious secrets, dangerous command snippets, overly broad tool permissions, sensitive local paths, and prompt-injection style text.</li>
-    <li><b>Conservative Quick Fixes</b>: fixes deterministic structure issues such as missing frontmatter, missing required fields, and mismatched skill names.</li>
+    <li><b>Specification-first checks</b>: validates <code>SKILL.md</code> frontmatter, required fields, name format, description limits,
+        and the relationship between the skill directory name and frontmatter <code>name</code>.
+    </li>
+    <li><b>Authoring quality hints</b>: highlights missing usage guidance, missing document structure, generic descriptions, and overly long
+        skill entry files.
+    </li>
+    <li><b>Reference and resource validation</b>: checks Markdown links, missing files, paths outside the skill directory, path casing
+        mismatches, unused <code>references/</code> files, and scripts that are not explained in <code>SKILL.md</code>.
+    </li>
+    <li><b>Safety signals</b>: flags suspicious secrets, dangerous shell snippets, broad <code>allowed-tools: Bash</code> permissions,
+        sensitive local paths, and prompt-injection style text.
+    </li>
+    <li><b>Conservative Quick Fixes</b>: repairs deterministic structure issues such as missing frontmatter, missing required fields,
+        invalid skill names, and missing local reference files.
+    </li>
+    <li><b>IDE workflow integration</b>: reports issues in Problems, supports right-click validation for project skills, provides a current
+        file validation button in the editor, and shows the current file Error / Warning count in the status bar.
+    </li>
 </ul>
 
-<h3>Where It Helps</h3>
+<h3>How To Use</h3>
 <ul>
-    <li>Creating a new Agent Skill from scratch.</li>
-    <li>Reviewing a team skill before committing or publishing it.</li>
-    <li>Migrating skills between Claude Code, Codex, Cursor, Junie, Copilot, or other Agent Skill consumers.</li>
-    <li>Keeping local reference files, scripts, and assets connected to the main <code>SKILL.md</code>.</li>
+    <li>Open a <code>SKILL.md</code> file and inspect the highlighted problems directly in the editor or Problems tool window.</li>
+    <li>Use available Quick Fixes for deterministic repairs such as adding frontmatter, required fields, or missing reference files.</li>
+    <li>Use the editor right-click action to validate all <code>SKILL.md</code> files in the current project.</li>
+    <li>Use the bottom-right editor validation button when you want to re-check the current skill explicitly.</li>
+    <li>Use <b>Settings | Tools | Skill Inspector</b> to enable or disable the plugin's <code>SKILL.md</code> inspection.</li>
 </ul>
 
 <h3>Design Approach</h3>
 <ul>
-    <li><b>Specification-first</b>: generic Agent Skills rules are treated as the default baseline instead of one vendor-specific dialect.</li>
-    <li><b>Low surprise</b>: warnings are intended to explain concrete authoring risks, not to enforce a single writing style.</li>
-    <li><b>Conservative fixes</b>: Quick Fixes repair structure but do not rewrite your instructions.</li>
-    <li><b>Local-first</b>: this version focuses on local IDE inspection, not remote registries or skill synchronization.</li>
+    <li><b>Specification-first</b>: generic Agent Skills rules are treated as the default baseline instead of one vendor-specific dialect.
+    </li>
+    <li><b>Low surprise</b>: warnings explain concrete authoring risks without enforcing a single writing style.</li>
+    <li><b>Conservative fixes</b>: Quick Fixes repair structure but do not rewrite your instructions or silently remove content.</li>
+    <li><b>Local-first</b>: inspection runs against local project files and keeps feedback in the IDE workflow.</li>
 </ul>
 
 <hr/>
 
 <h2>Skill Inspector</h2>
-<p>Skill Inspector 为 Agent Skill 编写过程提供 IDE 级别的即时反馈，让 <code>SKILL.md</code> 像代码一样具备结构检查、问题提示和确定性修复能力。</p>
-<p>Agent Skills 正在成为 AI coding agent 复用指令、脚本、参考文档和资源文件的一种常见方式。frontmatter 的小错误、本地引用失效、工具权限过宽，都会让 skill 更难被发现、更难执行，甚至更不适合分享。Skill Inspector 专注解决这些发生在编写阶段的问题，并把反馈直接放在 JetBrains IDE 里。</p>
+<p>Skill Inspector 是一个面向 JetBrains IDE 的 Agent Skill 编写与审查插件。它为 <code>SKILL.md</code> 提供实时 Inspection、Problems
+    定位和保守 Quick Fix，让 skill 作者在编辑时就能发现结构、引用、质量和安全问题。</p>
+<p>Agent Skills 用于把可复用的指令、脚本、参考文档和资源文件打包给 AI coding agent 使用。frontmatter 错误、本地引用失效、工具权限过宽，都会让
+    skill 更难被发现、更难执行，甚至不适合分享。Skill Inspector 专注解决这些发生在编写阶段的问题，并把反馈直接放在 JetBrains IDE 里。</p>
 <p>
     <a href="https://github.com/dong4j/skill-inspector">GitHub</a> |
-    <a href="https://agentskills.io/specification">Agent Skills Specification</a>
+    <a href="https://agentskills.io/specification">Agent Skills Specification</a> |
+    <a href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e">More plugins</a>
 </p>
 
-<h3>检查内容</h3>
-<p>插件以公开的 Agent Skills specification 作为默认基准，并结合 skill 周边文件和目录结构做实际编写场景中的检查。</p>
+<h3>核心能力</h3>
 <ul>
-    <li><b>Skill 结构</b>：校验 YAML frontmatter、必填字段、命名规则，以及 skill 目录名和 frontmatter <code>name</code> 的一致性。</li>
-    <li><b>编写质量</b>：提示缺少使用说明、缺少文档结构，以及主 <code>SKILL.md</code> 过长等问题。</li>
-    <li><b>本地引用</b>：检查相对 Markdown 链接，避免参考文件、脚本和资源在编辑或迁移过程中悄悄失效。</li>
-    <li><b>安全信号</b>：提示疑似密钥、危险命令片段、过宽工具权限、敏感本地路径和 prompt injection 风格文本。</li>
-    <li><b>保守 Quick Fix</b>：只修复确定性的结构问题，例如缺少 frontmatter、缺少必填字段、skill 名称不一致。</li>
+    <li><b>规范优先检查</b>：校验 <code>SKILL.md</code> frontmatter、必填字段、名称格式、描述长度，以及 skill 目录名和 frontmatter
+        <code>name</code> 的一致性。
+    </li>
+    <li><b>编写质量提示</b>：提示缺少使用时机、缺少文档结构、描述过泛、主 <code>SKILL.md</code> 过长等问题。</li>
+    <li><b>引用与资源校验</b>：检查 Markdown 链接、缺失文件、越界路径、大小写不一致、未引用的 <code>references/</code> 文件，以及未在
+        <code>SKILL.md</code> 中说明用途的脚本。
+    </li>
+    <li><b>安全信号</b>：提示疑似密钥、危险 shell 片段、过宽的 <code>allowed-tools: Bash</code> 权限、敏感本地路径和 prompt injection 风格文本。
+    </li>
+    <li><b>保守 Quick Fix</b>：只修复确定性的结构问题，例如缺少 frontmatter、缺少必填字段、非法 skill 名称、缺失本地引用文件。</li>
+    <li><b>IDE 工作流集成</b>：在 Problems 中展示问题，支持右键校验项目内 skill、编辑器当前文件校验按钮，并在状态栏展示当前文件 Error / Warning
+        数。
+    </li>
 </ul>
 
-<h3>适用场景</h3>
+<h3>如何使用</h3>
 <ul>
-    <li>从零创建新的 Agent Skill。</li>
-    <li>在提交或发布前审查团队维护的 skill。</li>
-    <li>在 Claude Code、Codex、Cursor、Junie、Copilot 或其他 Agent Skill 消费方之间迁移 skill。</li>
-    <li>维护 <code>SKILL.md</code> 与本地参考文件、脚本、资源文件之间的连接关系。</li>
+    <li>打开 <code>SKILL.md</code>，直接在编辑器或 Problems 工具窗口查看高亮问题。</li>
+    <li>对确定性结构问题使用 Quick Fix，例如补 frontmatter、补必填字段、创建缺失引用文件。</li>
+    <li>使用编辑器右键菜单校验当前项目中的所有 <code>SKILL.md</code>。</li>
+    <li>需要显式重检当前 skill 时，使用编辑器右下角校验按钮。</li>
+    <li>通过 <b>Settings | Tools | Skill Inspector</b> 启用或禁用 <code>SKILL.md</code> Inspection。</li>
 </ul>
 
 <h3>设计取向</h3>
 <ul>
     <li><b>规范优先</b>：以通用 Agent Skills 规则作为默认基准，而不是绑定某个厂商的私有方言。</li>
-    <li><b>低打扰</b>：提示应说明具体编写风险，而不是强迫所有 skill 使用同一种写作风格。</li>
-    <li><b>保守修复</b>：Quick Fix 修复结构，不自动改写用户写下的指令内容。</li>
-    <li><b>本地优先</b>：当前版本聚焦 IDE 内本地检查，不包含远端 registry 或 skill 同步能力。</li>
+    <li><b>低打扰</b>：提示说明具体编写风险，不强迫所有 skill 使用同一种写作风格。</li>
+    <li><b>保守修复</b>：Quick Fix 修复结构，不自动改写指令正文，也不静默删除内容。</li>
+    <li><b>本地优先</b>：检查面向本地项目文件，并把反馈保留在 IDE 工作流中。</li>
 </ul>

@@ -8,14 +8,14 @@
 
 ## 一、当前坐标
 
-| 维度                                                       | 状态                                |
-|----------------------------------------------------------|-----------------------------------|
-| V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关）        | ✅ 完成                              |
-| V1 收尾（2 条规则 + reference-style links + Action 实化）         | ✅ 完成（Inspection fixture 测试延后到 V2） |
-| V1 体验增强（编辑器右下角浮动按钮 + 毛玻璃 FAB）                              | ✅ 完成（PoC 阶段曾对比官方 `FloatingToolbarProvider` 方案，最终收敛到自定义 Swing 注入） |
-| V2 多 Agent Profile                                       | ⏳ 设计已就绪，未启动                       |
-| V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后                       |
-| AI 审查（二期）                                                | 📅 提示词模板已沉淀到 `ai-review.md`，待集成   |
+| 维度                                                       | 状态                                                               |
+|----------------------------------------------------------|------------------------------------------------------------------|
+| V1 MVP（Inspection 闭环 + 4 套规则 + 6 Quick Fix + 总开关）        | ✅ 完成                                                             |
+| V1 收尾（2 条规则 + reference-style links + Action 实化）         | ✅ 完成                                                             |
+| V1 体验增强（编辑器右下角浮动按钮 + 毛玻璃 FAB + 状态栏计数）                    | ✅ 完成（PoC 阶段曾对比官方 `FloatingToolbarProvider` 方案，最终收敛到自定义 Swing 注入） |
+| V2 多 Agent Profile                                       | ⏳ 设计已就绪，未启动                                                      |
+| V3 Skill Explorer / V4 SkillsJar Manager / V5 Zeka Stack | 📅 等 V2 验证后                                                      |
+| AI 审查（二期）                                                | 📅 提示词模板已沉淀到 `ai-review.md`，待集成                                  |
 
 ## 二、已实现 —— V1 MVP 全貌
 
@@ -25,7 +25,7 @@
 infra → model → parser → rules → quickfix → settings/statusbar → inspection → tests → docs
 ```
 
-### 2.1 模块清单（32 个 Java 源文件 + 11 个测试类）
+### 2.1 模块清单（39 个 Java 源文件 + 14 个测试类）
 
 | 模块            | 落地能力                                                                                                                                                                            |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -35,10 +35,11 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 | **结构规则**      | 11 条 Error，覆盖 frontmatter 必填、长度上限、kebab-case、name/目录一致性                                                                                                                         |
 | **质量规则**      | 6 条 Warning / Weak Warning，覆盖 description 与正文质量                                                                                                                                 |
 | **引用规则**      | 4 条，相对链接缺失 / 越界 / 大小写 / 非法路径                                                                                                                                                    |
+| **资源规则**      | 2 条，`references/` 未引用文件 / `scripts/` 未说明用法                                                                                                                                      |
 | **安全规则**      | 5 条，secret / 危险命令 / 过宽 `allowed-tools` / 敏感路径 / prompt injection                                                                                                                |
 | **Quick Fix** | 6 种确定性修复                                                                                                                                                                        |
-| **配置入口**      | 应用级 `PersistentStateComponent` + Settings 页 + 状态栏（图标单击切换）                                                                                                                       |
-| **测试覆盖**      | parser 8 类用例 / 四套 rules / RuleRunner / Quick Fix 文本 / settings / detector                                                                                                       |
+| **配置入口**      | 应用级 `PersistentStateComponent` + Settings 页；状态栏只展示当前文件 Error / Warning 计数                                                                                                       |
+| **测试覆盖**      | 72 个 `@Test`，覆盖 parser / 五套 rules / RuleRunner / fixture 规则期望 / Quick Fix 文本 / settings / detector / duplicate guard                                                            |
 
 ### 2.2 关键架构决策（值得长期保持）
 
@@ -57,10 +58,11 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
    IntelliJ 对象。
 
 4. **配置入口收敛**
-   应用级 `skillInspectionEnabled` 一个开关 → Settings 页和状态栏共用同一份状态 → 关闭即整个 Inspection 短路返回。
+   应用级 `skillInspectionEnabled` 一个开关 → Settings 页负责持久化配置 → 关闭即整个 Inspection 短路返回。
 
-5. **状态栏极简交互**
-   `IconPresentation` + `getClickConsumer()`，靠 `AllIcons.General.InspectionsEye` / `InspectionsPowerSaveMode` 两个内置图标做颜色对比，无自定义资源，主题自适应。
+5. **状态栏问题计数**
+   `TextPresentation` 展示当前编辑器文件的 Error / Warning 数；非 `SKILL.md` 文件显示 `N/A`，启停检查交给 Settings 和 IDE 自带 Power Save
+   Mode。
 
 ## 三、贯穿 V1 - V5 + AI 审查 的 TODO List
 
@@ -78,16 +80,16 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 - [x] `SkillMdInspection`：LocalInspectionTool 适配
 - [x] `SkillQuickFix` + `SkillFixType`：6 种修复
 - [x] 应用级 `PersistentStateComponent` + Settings 页
-- [x] 状态栏组件（V1 末期重构为图标单击切换）
-- [x] 单元测试：parser / 四套 rules / RuleRunner / quickfix / settings / detector
+- [x] 状态栏组件（V1 末期重构为当前文件 Error / Warning 计数）
+- [x] 单元测试：parser / 五套 rules / RuleRunner / quickfix / settings / detector / inspection duplicate guard / fixture 规则期望
 
-### V1 收尾 — ✅ 全部完成（Fixture 测试延后到 V2）
+### V1 收尾 — ✅ 全部完成（IDE fixture 测试延后到 V2）
 
 - [x] `resource.unused-reference` 规则：`references/` 下未被正文链接的文件
 - [x] `script.missing-usage` 规则：`scripts/` 下脚本未在正文说明用法
 - [x] Markdown reference-style links 解析：PSI 递归遍历天然覆盖 `LINK_DEFINITION` 节点中的 `LINK_DESTINATION`，新增专门测试用例锁定行为
 - [x] `SkillInspectorAction` 实化：扫描全项目 SKILL.md → 跑 `RuleRunner` 汇总 Error/Warning → 激活 Problems View → 自动打开第一个有错的文件
-- [x] 为新规则、reference-style links、Action 补单元测试（测试总数 53 → 63）
+- [x] 为新规则、reference-style links、Action、重复诊断保护和 fixture 规则期望补测试（当前 72 个 `@Test`）
 - [x] **编辑器浮动按钮**（`SkillBottomFloatingButton` + `SkillBottomFloatingInstaller`）：
   自定义圆角矩形 FAB（icon + 文本 + 毛玻璃背景），通过 `AppLifecycleListener` 挂全局
   `EditorFactoryListener`，把按钮放到编辑器外层 `JLayeredPane#PALETTE_LAYER`，**精确停在右下角**。
@@ -95,7 +97,8 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
   按钮关联的 editor/file/project，规避"按钮挂 RootPane → DataContext 拿到 focus 编辑器"的陷阱
 - [x] **PoC 取舍**：曾用官方 `editorFloatingToolbarProvider` 做对照（右上角、平台默认样式），
   PoC 验证后选定自定义右下角方案，官方 Provider 路径与 `SkillFloatingGroup` ActionGroup 已移除
-- [ ] Inspection fixture 测试：用 `CodeInsightTestFixture` 验证 `ProblemDescriptor` 注册与 Quick Fix 真实写入（**延后到 V2**，与 Profile 引入一并补）
+- [x] 第一层 fixture 自动化：用 `src/test/resources/fixtures/skills` 锁定各规则样例的期望 `ruleId`
+- [ ] IDE fixture 测试：用 `CodeInsightTestFixture` 验证 `ProblemDescriptor` 注册与 Quick Fix 真实写入（**延后到 V2**，与 Profile 引入一并补）
 
 ### V2 多 Agent Profile — ⏳ 未开始
 
@@ -114,7 +117,6 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 - [ ] **Intention：Rename Skill**：同步重命名父目录 + name
 - [ ] **Intention：Extract Section to references/**：协助拆分过长正文
 - [ ] **Inspection 抑制注释**：支持 `<!-- noinspection ruleId -->` 行级抑制
-- [ ] **状态栏图标问题角标**：当前 SKILL.md 有 N 个 Error 时显示数字角标
 - [ ] **Problems 面板分组**：4 类规则拆成 4 个 Inspection，用户可在 Inspection profile 树里单独勾选
 - [ ] **Frontmatter Schema 提示**：给 YAML 注入 schema，敲 `na` 时补全 `name:`
 - [ ] **Quick Fix Preview**：接 `LocalQuickFix.generatePreview`
@@ -171,7 +173,7 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 | `AGENTS.md`                   | ✅ 对齐  | V1 收尾时已更新：Action 行为说明、ResourceRules 包结构、status.md / ai-review.md 文档表 |
 | `docs/design.md`              | ✅ 对齐  | 领域模型 + 模块划分与代码一致                                                     |
 | `docs/rules.md`               | ✅ 对齐  | 新增 `resource.unused-reference` / `script.missing-usage` 两行，删除"计划中"提示 |
-| `docs/todo.md`                | ✅ 对齐  | 把已交付项纳入"已交付能力"清单，删除"待实现规则"段，"待实现 Quick Fix"仅留明确不做项                   |
+| `docs/todo.md`                | ✅ 对齐  | 已交付能力已迁出；保留用户新增的下一阶段可行性分析需求，暂不展开实现方案                                 |
 | `docs/roadmap.md`             | ✅ 对齐  | V1-V5 路线清晰                                                           |
 | `docs/implementation-plan.md` | ✅ 对齐  | 新增 Phase 5 "V1 收尾"段，"未开始"清单清掉过时项                                     |
 | `docs/status.md`              | ✅ 本文件 | 活文档，每阶段更新                                                            |
@@ -182,8 +184,8 @@ infra → model → parser → rules → quickfix → settings/statusbar → ins
 1. ~~完成 V1 收尾 5 项（参见 §3 V1 收尾）~~ —— ✅ 完成
 2. ~~同步 `rules.md` / `todo.md` / `implementation-plan.md` 中过时表格~~ —— ✅ 完成
 3. **下一步**：V2 启动前，先评审 `ai-review.md` 中 8 项 AR 任务，决定二期 AI 审查与 V2 Profile 的实施先后
-4. **下一步**：V2 启动时同步补齐 Inspection fixture 测试（`CodeInsightTestFixture`）
+4. **下一步**：V2 启动时同步补齐 IDE fixture 测试（`CodeInsightTestFixture`）
 
 ---
 
-最后更新：2026-05-25（移除 PoC 阶段的官方 `FloatingToolbarProvider` 方案，浮动按钮唯一实现为右下角自定义毛玻璃 FAB）
+最后更新：2026-05-25（V1 文档收口：对齐状态栏计数、ResourceRules、Action 实化和 fixture 规则期望测试）

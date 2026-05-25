@@ -14,7 +14,7 @@
 - 保守 Quick Fix：补 frontmatter / `name` / `description` / 同步 `name` 为父目录名。
 - Markdown 相对链接检查：缺失、目录越界、大小写、非法路径。
 - 安全风险提示：疑似密钥、危险命令、过宽 `allowed-tools`、敏感路径、prompt injection。
-- 应用级总开关 + 状态栏快速切换。
+- 应用级总开关 + 状态栏当前文件 Error / Warning 计数。
 
 ### V2: 多 Agent Profile
 
@@ -51,7 +51,7 @@
 - Markdown 相对链接通过 Markdown PSI `LINK_DESTINATION` 节点提取，不做正则扫描。
 - 问题通过 `ProblemDescriptor` 注册到 Problems 面板；严重度由 `SkillSeverity` 映射到 `ProblemHighlightType`。
 - 自动修复通过单一 `SkillQuickFix` + `SkillFixType` 枚举派发，纯文本逻辑集中在 `SkillQuickFixTexts` 便于单测。
-- 配置项放入 IDE Settings + Status Bar，V2 起逐步支持 profile 与规则开关。
+- 配置项放入 IDE Settings；Status Bar 展示当前文件问题计数，V2 起逐步支持 profile 与规则开关。
 
 实际代码结构（与 `docs/design.md` §9 同步，仅示意，不需对齐建议层级）：
 

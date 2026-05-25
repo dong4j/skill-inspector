@@ -1,35 +1,52 @@
 <div>
     <h3>2026.1.1000</h3>
     <ul>
-        <li>Added the first working <code>SKILL.md</code> inspection workflow for Agent Skill authoring.</li>
-        <li>Added YAML frontmatter validation for required <code>name</code> and <code>description</code> fields.</li>
-        <li>Added kebab-case validation and parent-directory consistency checks for skill names.</li>
-        <li>Added Markdown body quality hints, including title, usage-trigger, and length checks.</li>
-        <li>Added local Markdown reference checks for missing files, paths outside the skill directory, and path casing mismatches.</li>
-        <li>Added security hints for suspicious secrets, dangerous shell commands, broad <code>allowed-tools: Bash</code> permissions,
-            sensitive local paths, and prompt-injection phrases.
+        <li>Added the initial Agent Skill authoring inspection workflow for JetBrains IDEs.</li>
+        <li>Added real-time <code>SKILL.md</code> validation with Problems tool window integration.</li>
+        <li>Added YAML frontmatter checks for required fields, length limits, kebab-case names, and parent-directory consistency.</li>
+        <li>Added Markdown body quality hints for missing titles, missing usage guidance, generic descriptions, and oversized skill entry
+            files.
         </li>
-        <li>Added Quick Fixes for deterministic structure issues: create frontmatter, add required fields, and synchronize <code>name</code>
-            with the directory name.
+        <li>Added Markdown reference validation for missing files, paths outside the skill directory, invalid paths, and path casing
+            mismatches.
         </li>
-        <li>Added a Settings page and Status Bar toggle to enable or disable <code>SKILL.md</code> inspections globally.</li>
-        <li>Added Markdown plugin dependency registration and fixed false positives for official Agent Skill examples that define usage
-            triggers in frontmatter <code>description</code>.
+        <li>Added resource usage checks for unused <code>references/</code> files and scripts that are not linked or explained in
+            <code>SKILL.md</code>.
         </li>
-        <li>Added unit tests for parsers, rules, Quick Fix text generation, settings, and the default rule runner.</li>
+        <li>Added safety inspections for suspicious secrets, dangerous shell snippets, broad <code>allowed-tools: Bash</code> permissions,
+            sensitive local paths, and prompt-injection style text.
+        </li>
+        <li>Added conservative Quick Fixes for deterministic structure issues, including frontmatter creation, required field insertion,
+            skill name normalization, directory-name synchronization, and missing reference file creation.
+        </li>
+        <li>Added project-level validation from the editor context menu to scan all project <code>SKILL.md</code> files and open the first
+            file with errors.
+        </li>
+        <li>Added a bottom-right editor validation button for checking the current <code>SKILL.md</code> file explicitly.</li>
+        <li>Added a status bar counter that shows the current <code>SKILL.md</code> Error / Warning count and displays <code>N/A</code> for
+            non-skill files.
+        </li>
+        <li>Added <b>Settings | Tools | Skill Inspector</b> with a global inspection enablement switch.</li>
+        <li>Added automated coverage for parsers, rules, rule fixtures, Quick Fix text generation, settings, detector behavior, and
+            duplicate
+            diagnostic protection.
+        </li>
     </ul>
 
     <ul>
-        <li>新增首个可用的 <code>SKILL.md</code> Inspection 流程，用于 Agent Skill 编写校验。</li>
-        <li>新增 YAML frontmatter 校验，覆盖必填字段 <code>name</code> 和 <code>description</code>。</li>
-        <li>新增 skill 名称 kebab-case 校验，以及与父目录名一致性检查。</li>
-        <li>新增 Markdown 正文质量提示，包括标题、使用时机和正文长度检查。</li>
-        <li>新增本地 Markdown 引用检查，覆盖缺失文件、跳出 skill 目录的路径和路径大小写不一致。</li>
-        <li>新增安全提示，覆盖疑似密钥、危险 shell 命令、过宽的 <code>allowed-tools: Bash</code> 权限、敏感本地路径和 prompt injection 文案。
+        <li>新增首个面向 JetBrains IDE 的 Agent Skill 编写检查流程。</li>
+        <li>新增 <code>SKILL.md</code> 实时校验，并接入 Problems 工具窗口。</li>
+        <li>新增 YAML frontmatter 检查，覆盖必填字段、长度限制、kebab-case 名称和父目录一致性。</li>
+        <li>新增 Markdown 正文质量提示，覆盖缺少标题、缺少使用时机、描述过泛和主 skill 文件过长。</li>
+        <li>新增 Markdown 引用校验，覆盖缺失文件、跳出 skill 目录、非法路径和路径大小写不一致。</li>
+        <li>新增资源使用检查，覆盖未引用的 <code>references/</code> 文件，以及未在 <code>SKILL.md</code> 中链接或说明的脚本。</li>
+        <li>新增安全检查，覆盖疑似密钥、危险 shell 片段、过宽的 <code>allowed-tools: Bash</code> 权限、敏感本地路径和 prompt injection 风格文本。
         </li>
-        <li>新增针对确定性结构问题的 Quick Fix：创建 frontmatter、补齐必填字段、同步 <code>name</code> 为目录名。</li>
-        <li>新增 Settings 页面和 Status Bar 开关，用于全局启用或禁用 <code>SKILL.md</code> 检查。</li>
-        <li>补充 Markdown 插件依赖注册，并修复官方 Agent Skill 示例中使用时机写在 frontmatter <code>description</code> 时的误报。</li>
-        <li>新增 parser、规则、Quick Fix 文本生成、设置和默认规则执行器的单元测试。</li>
+        <li>新增保守 Quick Fix，覆盖创建 frontmatter、补必填字段、规范化 skill 名称、同步目录名，以及创建缺失引用文件。</li>
+        <li>新增编辑器右键项目级校验，可扫描项目内全部 <code>SKILL.md</code> 并打开第一个存在 Error 的文件。</li>
+        <li>新增编辑器右下角当前文件校验按钮，用于显式检查当前 <code>SKILL.md</code>。</li>
+        <li>新增状态栏问题计数，当前 <code>SKILL.md</code> 显示 Error / Warning 数，非 skill 文件显示 <code>N/A</code>。</li>
+        <li>新增 <b>Settings | Tools | Skill Inspector</b> 全局 Inspection 开关。</li>
+        <li>新增 parser、规则、fixture 规则期望、Quick Fix 文本生成、设置、文件识别和重复诊断保护的自动化测试覆盖。</li>
     </ul>
 </div>

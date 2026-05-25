@@ -4,14 +4,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
 
-import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
-
 import org.jetbrains.annotations.NotNull;
+
+import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 
 /**
  * Skill Inspector 状态栏组件工厂
- * <p> 注册一个轻量 Status Bar Widget, 用户可以直接在状态栏查看并切换
- * {@code SKILL.md} 格式检查开关.
+ * <p> 注册一个轻量 Status Bar Widget, 用于展示当前文件的 Skill Inspector
+ * Error / Warning 计数. 非 {@code SKILL.md} 文件显示 N/A.
  *
  * @author dong4j
  * @version 1.0.0

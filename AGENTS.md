@@ -64,7 +64,7 @@ src/main/java/dev/dong4j/idea/skill/inspector/
 ├── quickfix/                    # Quick Fix 实现（SkillQuickFix + SkillQuickFixTexts）
 ├── rules/                       # 检查规则（Structural / Quality / Reference / Resource / Security）
 ├── settings/                    # 应用级设置 + Settings 页
-├── statusbar/                   # 状态栏开关
+├── statusbar/                   # 状态栏当前文件问题计数
 └── util/                        # 工具类
     ├── NotificationUtil.java      # 通知工具
     ├── SkillInspectorBundle.java  # 国际化

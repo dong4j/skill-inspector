@@ -3,20 +3,21 @@ package dev.dong4j.idea.skill.inspector.settings;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.ui.components.JBCheckBox;
 
-import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
-
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.BorderLayout;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import java.awt.BorderLayout;
+
+import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 
 /**
  * Skill Inspector 设置页
- * <p> 当前只提供一个全局开关, 用于启用或禁用 {@code SKILL.md} 格式检查. 设置页和
- * Status Bar 使用同一个 {@link SkillInspectorSettings} 状态, 避免出现多个开关状态不一致.
+ * <p> 当前只提供一个全局开关, 用于启用或禁用 {@code SKILL.md} 格式检查. 状态栏只展示
+ * 当前文件的问题计数, 不再承担开关职责; 临时关闭检查应使用 IDE 自带 Power Save Mode.
  *
  * @author dong4j
  * @version 1.0.0
@@ -58,7 +59,7 @@ public class SkillInspectorConfigurable implements SearchableConfigurable {
     @Override
     public boolean isModified() {
         return enabledCheckBox != null
-            && enabledCheckBox.isSelected() != SkillInspectorSettings.getInstance().isSkillInspectionEnabled();
+               && enabledCheckBox.isSelected() != SkillInspectorSettings.getInstance().isSkillInspectionEnabled();
     }
 
     @Override

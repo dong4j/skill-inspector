@@ -3,7 +3,7 @@
 Skill Inspector 是一个面向 JetBrains IDE 的 Agent Skill 规范检查插件，重点检查 `SKILL.md` 及其关联目录、引用文件和脚本是否符合 Agent Skill
 的常见写法约束。
 
-项目的第一阶段只聚焦一件事：让 `SKILL.md` 像代码一样在 IDEA 中具备实时 Inspection、Problems 展示和 Quick Fix 能力。
+当前版本聚焦一件事：让 `SKILL.md` 像代码一样在 IDEA 中具备实时 Inspection、Problems 展示、手动校验和 Quick Fix 能力。
 
 ## 背景
 
@@ -36,7 +36,7 @@ allowed-tools: Read Edit
 Use this skill when...
 ```
 
-目前 JetBrains 生态已经有 Skill 管理、发现、导入方向的能力，但缺少一个专门围绕 `SKILL.md` 写作质量、结构规范、跨 Agent 兼容性和安全风险做检查的轻量插件。Skill
+目前 JetBrains 生态已经有 Skill 管理、发现、导入方向的能力，但缺少一个专门围绕 `SKILL.md` 写作质量、结构规范、本地引用和安全风险做检查的轻量插件。Skill
 Inspector 的定位就是补上这块开发体验。
 
 ## 规范基准
@@ -61,13 +61,14 @@ Skill Inspector 的检查规则以 [Agent Skills specification](https://agentski
 
 - 识别项目中的 `SKILL.md` 文件。
 - 检查 skill 目录结构是否合理。
-- 校验 YAML frontmatter 的必填字段、字段类型和兼容性。
+- 校验 YAML frontmatter 的必填字段、长度限制和命名规范。
 - 检查 `name` 与父目录名是否一致。
 - 检查 `description` 是否足够清晰、具体。
 - 检查 Markdown 正文是否包含必要使用说明。
 - 检查引用文件、脚本和资源路径是否存在。
 - 提示过长正文、未引用资源、危险工具权限和潜在敏感信息。
 - 在 IDEA Problems 面板中展示问题，并提供 Quick Fix。
+- 通过右键菜单和编辑器右下角浮动按钮手动校验当前或项目内的 `SKILL.md`。
 
 ## 进一步阅读
 

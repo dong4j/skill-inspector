@@ -1,31 +1,42 @@
 package dev.dong4j.idea.skill.inspector.statusbar;
 
-import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
-import com.intellij.util.Consumer;
-
-import dev.dong4j.idea.skill.inspector.settings.SkillInspectorSettings;
-import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.util.messages.MessageBusConnection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.event.MouseEvent;
+import java.util.List;
 
-import javax.swing.Icon;
+import dev.dong4j.idea.skill.inspector.detection.SkillFileDetector;
+import dev.dong4j.idea.skill.inspector.model.SkillFile;
+import dev.dong4j.idea.skill.inspector.model.SkillProblem;
+import dev.dong4j.idea.skill.inspector.model.SkillSeverity;
+import dev.dong4j.idea.skill.inspector.parser.SkillModelBuilder;
+import dev.dong4j.idea.skill.inspector.rules.RuleRunner;
+import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 
 /**
  * Skill Inspector 状态栏组件
- * <p> 使用 {@link StatusBarWidget.IconPresentation} 提供一个轻量"图标 + 单击切换"控件,
- * 不再展示文字, 也不再弹出二级菜单, 用户单击图标即可在"启用 / 禁用 SKILL.md 检查"之间切换.
- * <p> 通过两个 IntelliJ 内置图标天然形成颜色对比:
+ * <p>状态栏不再承担"启用 / 禁用检查"职责, 该能力交给 IDE 自带 Power Save Mode
+ * 和 Settings 总开关。本组件只展示当前编辑器文件的 Skill Inspector 计数:
  * <ul>
- *   <li>{@link AllIcons.General#InspectionsEye} —— 启用 (蓝色"眼睛", 主题原生表达"主动检查中")</li>
- *   <li>{@link AllIcons.General#InspectionsPowerSaveMode} —— 禁用 (灰色"眼睛", 主题原生表达"检查已停")</li>
+ *   <li>当前文件不是 {@code SKILL.md}: 显示 {@code Skill: N/A}</li>
+ *   <li>当前文件是 {@code SKILL.md}: 显示 {@code Skill: xE/yW}</li>
  * </ul>
- * 这样可以避免自定义图标 / 颜色, 自动适配 IDE 浅色 / 深色主题.
  *
  * @author dong4j
  * @version 1.0.0
@@ -33,13 +44,19 @@ import javax.swing.Icon;
  * @date 2026.05.23
  * @since 1.0.0
  */
-public class SkillInspectorStatusBarWidget implements StatusBarWidget, StatusBarWidget.IconPresentation {
+public class SkillInspectorStatusBarWidget implements StatusBarWidget, StatusBarWidget.TextPresentation {
 
     /** 所属项目, 用于在 dispose 时安全地跳过刷新 */
     private final Project project;
 
-    /** 当前状态栏实例, 用于切换后刷新展示 */
+    /** 默认规则执行器 */
+    private final RuleRunner ruleRunner = new RuleRunner();
+
+    /** 当前状态栏实例, 用于刷新当前文件的问题计数 */
     private StatusBar statusBar;
+
+    /** 文件切换消息连接, widget dispose 时释放 */
+    private MessageBusConnection messageBusConnection;
 
     /**
      * 创建状态栏组件
@@ -59,10 +76,32 @@ public class SkillInspectorStatusBarWidget implements StatusBarWidget, StatusBar
     @Override
     public void install(@NotNull StatusBar statusBar) {
         this.statusBar = statusBar;
+        messageBusConnection = project.getMessageBus().connect(this);
+        messageBusConnection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                refresh();
+            }
+
+            @Override
+            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                refresh();
+            }
+        });
+        EditorFactory.getInstance().getEventMulticaster().addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(@NotNull DocumentEvent event) {
+                refresh();
+            }
+        }, this);
     }
 
     @Override
     public void dispose() {
+        if (messageBusConnection != null) {
+            messageBusConnection.disconnect();
+            messageBusConnection = null;
+        }
         statusBar = null;
     }
 
@@ -74,50 +113,90 @@ public class SkillInspectorStatusBarWidget implements StatusBarWidget, StatusBar
 
     @Override
     @NotNull
-    public Icon getIcon() {
-        return SkillInspectorSettings.getInstance().isSkillInspectionEnabled()
-            ? AllIcons.General.InspectionsEye
-            : AllIcons.General.InspectionsPowerSaveMode;
+    public String getText() {
+        StatusInfo statusInfo = currentStatus();
+        if (!statusInfo.skillFile()) {
+            return SkillInspectorBundle.message("statusbar.text.na");
+        }
+        return SkillInspectorBundle.message("statusbar.text.count", statusInfo.errors(), statusInfo.warnings());
     }
 
     @Override
     @Nullable
     public String getTooltipText() {
-        return SkillInspectorBundle.message(
-            SkillInspectorSettings.getInstance().isSkillInspectionEnabled()
-                ? "statusbar.tooltip.enabled"
-                : "statusbar.tooltip.disabled"
-        );
+        StatusInfo statusInfo = currentStatus();
+        if (!statusInfo.skillFile()) {
+            return SkillInspectorBundle.message("statusbar.tooltip.na");
+        }
+        return SkillInspectorBundle.message("statusbar.tooltip.count", statusInfo.errors(), statusInfo.warnings());
     }
 
-    /**
-     * 单击图标即切换开关.
-     * <p> 关键约束: 返回类型必须是 {@link com.intellij.util.Consumer}, 而不是
-     * {@link java.util.function.Consumer}, 否则 IntelliJ 不会把它当成点击回调.
-     *
-     * @return 单击回调
-     */
     @Override
-    @NotNull
-    public Consumer<MouseEvent> getClickConsumer() {
-        return event -> toggle();
+    public float getAlignment() {
+        return 0.5F;
     }
 
     /**
-     * 切换全局开关并刷新状态栏图标
+     * 计算当前编辑器文件的问题计数.
+     * <p>规则执行会访问 PSI, 必须放在 read action 内. Dumb 模式下跳过计算, 避免索引未就绪时
+     * 状态栏反复触发规则链路.
      */
-    private void toggle() {
-        SkillInspectorSettings settings = SkillInspectorSettings.getInstance();
-        settings.setSkillInspectionEnabled(!settings.isSkillInspectionEnabled());
-        refresh();
+    @NotNull
+    private StatusInfo currentStatus() {
+        if (project.isDisposed() || DumbService.isDumb(project)) {
+            return StatusInfo.notSkillFile();
+        }
+        VirtualFile[] selectedFiles = FileEditorManager.getInstance(project).getSelectedFiles();
+        if (selectedFiles.length == 0 || !SkillFileDetector.SKILL_FILE_NAME.equals(selectedFiles[0].getName())) {
+            return StatusInfo.notSkillFile();
+        }
+
+        return ApplicationManager.getApplication().runReadAction((com.intellij.openapi.util.Computable<StatusInfo>) () -> {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(selectedFiles[0]);
+            if (psiFile == null || !SkillFileDetector.isSkillFile(psiFile)) {
+                return StatusInfo.notSkillFile();
+            }
+            SkillFile skillFile = SkillModelBuilder.build(psiFile);
+            List<SkillProblem> problems = ruleRunner.run(skillFile);
+            int errors = 0;
+            int warnings = 0;
+            for (SkillProblem problem : problems) {
+                if (problem.severity() == SkillSeverity.ERROR) {
+                    errors++;
+                } else {
+                    warnings++;
+                }
+            }
+            return StatusInfo.skillFile(errors, warnings);
+        });
     }
 
     /**
-     * 通知 StatusBar 重新拉取 icon / tooltip
+     * 通知 StatusBar 重新拉取 text / tooltip.
+     * <p>文档事件可能发生在写操作过程中, 直接同步刷新会让状态栏在事件栈内重新读取 PSI.
+     * 延迟到当前事件之后执行, 可以让 IDE 先完成文档提交和 daemon 调度.
      */
     private void refresh() {
-        if (statusBar != null && !project.isDisposed()) {
-            statusBar.updateWidget(ID());
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (statusBar != null && !project.isDisposed()) {
+                statusBar.updateWidget(ID());
+            }
+        });
+    }
+
+    /**
+     * 状态栏展示模型.
+     */
+    private record StatusInfo(boolean skillFile, int errors, int warnings) {
+
+        @NotNull
+        static StatusInfo notSkillFile() {
+            return new StatusInfo(false, 0, 0);
+        }
+
+        @NotNull
+        static StatusInfo skillFile(int errors, int warnings) {
+            return new StatusInfo(true, errors, warnings);
         }
     }
 }
