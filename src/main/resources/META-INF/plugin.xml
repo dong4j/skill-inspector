@@ -43,13 +43,14 @@
                            isLogByDefault="true"/>
 
         <!-- SKILL.md 规范检查
-             不绑定 Markdown language: Markdown 插件会为方言、预览和注入片段建立多路 PSI/daemon 调度,
-             language="Markdown" 在 Problems View 中容易把同一批 descriptor 写入两次。
-             本插件的真实边界是文件名与物理 PSI, 由 SkillFileDetector 在运行时过滤。 -->
-        <localInspection groupBundle="messages.SkillInspectorBundle"
+             绑定 Markdown 以满足 IntelliJ plugin.xml schema, 真实边界仍由
+             SkillFileDetector 和 SkillMdInspection 的幂等保护共同收束。 -->
+        <localInspection language="Markdown"
+                         groupBundle="messages.SkillInspectorBundle"
                          groupKey="inspection.group.name"
                          shortName="SkillMdInspection"
-                         displayNameKey="inspection.skill.md.display.name"
+                         bundle="messages.SkillInspectorBundle"
+                         key="inspection.skill.md.display.name"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="dev.dong4j.idea.skill.inspector.inspection.SkillMdInspection"/>
