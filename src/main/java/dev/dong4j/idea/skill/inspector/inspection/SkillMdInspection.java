@@ -1,11 +1,11 @@
 package dev.dong4j.idea.skill.inspector.inspection;
 
-import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
-import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 
 import dev.dong4j.idea.skill.inspector.detection.SkillFileDetector;
@@ -21,12 +21,10 @@ import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 import dev.dong4j.idea.skill.inspector.util.TextRangeUtil;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SKILL.md Inspection
@@ -44,8 +42,16 @@ public class SkillMdInspection extends LocalInspectionTool {
     /** 默认规则执行器 */
     private final RuleRunner ruleRunner = new RuleRunner();
 
-    /** 诊断日志: 用于排查 IDE 是否对同一 PsiFile 多次调用 checkFile (导致 Problems View 出现重复) */
-    private static final Logger LOG = Logger.getInstance(SkillMdInspection.class);
+    /**
+     * IDE daemon 可能在同一份 Markdown 文件、同一份文本版本上并发启动多轮 LocalInspection 会话。
+     * <p>这些会话来自 IDE 外层调度, 单次 {@link RuleRunner} 与单个 {@link ProblemsHolder}
+     * 内部都无法看见彼此, 所以只能在 inspection 适配层做一个短窗口防抖。key 包含文件路径、
+     * PSI modification stamp、ruleId、range 和 message, 文本一变就会自然失效, 不影响重新检查.
+     */
+    private static final Map<String, Long> RECENT_PROBLEM_KEYS = new ConcurrentHashMap<>();
+
+    /** 重复 daemon 会话通常在毫秒级完成; 这个窗口只用于挡同一批 descriptor 的并发重复写入 */
+    private static final long DUPLICATE_SUPPRESSION_WINDOW_MILLIS = 1_000L;
 
     @Override
     @NotNull
@@ -70,63 +76,89 @@ public class SkillMdInspection extends LocalInspectionTool {
         return true;
     }
 
-    /**
-     * 声明这是 whole-file inspection, 强制 IDE 只调度一次 {@link #checkFile} 跑整个文件,
-     * 不要再走默认的 visitor 路径 (visitor 会按 PSI element 触发, 可能跟 checkFile 同时调度,
-     * 导致同一个 problem 被写入 Problems View 两次).
-     * <p>这是修掉"Problems View 所有 SKILL.md 警告精确重复 2 次"的根因.
-     */
     @Override
-    public boolean runForWholeFile() {
-        return true;
+    @NotNull
+    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
+        return new PsiElementVisitor() {
+            @Override
+            public void visitFile(@NotNull PsiFile file) {
+                inspectFile(file, holder, isOnTheFly);
+            }
+        };
     }
 
-    @Override
-    @Nullable
-    public ProblemDescriptor[] checkFile(@NotNull PsiFile file,
-                                         @NotNull InspectionManager manager,
-                                         boolean isOnTheFly) {
+    /**
+     * 按文件粒度注册问题.
+     * <p>Skill 规则天然是 whole-file 语义, 不依赖逐 PSI 节点遍历. 使用 visitor 的
+     * {@link PsiElementVisitor#visitFile(PsiFile)} 作为唯一入口, 可以避开 {@code checkFile}
+     * 与 daemon visitor 调度交叉时在 Problems View 中产生重复 descriptor 的风险.
+     */
+    private void inspectFile(@NotNull PsiFile file, @NotNull ProblemsHolder holder, boolean isOnTheFly) {
         if (!SkillInspectorSettings.getInstance().isSkillInspectionEnabled() || !SkillFileDetector.isSkillFile(file)) {
-            return ProblemDescriptor.EMPTY_ARRAY;
+            return;
         }
 
         SkillFile skillFile = SkillModelBuilder.build(file);
-        List<SkillProblem> problems = ruleRunner.run(skillFile);
-        // 双重去重防御: RuleRunner 已按 ruleId+range 去重, 这里再用 ProblemDescriptor 维度 (ruleId+offsets) 去重一次,
-        // 防止 IDE 在同一 PSI 上多次触发 daemon highlighting pass 时, Problems View 累积出多条完全相同的条目.
-        Set<String> seen = new HashSet<>();
-        List<ProblemDescriptor> descriptors = new ArrayList<>(problems.size());
-        for (SkillProblem problem : problems) {
-            String key = problem.ruleId() + "@" + problem.range().getStartOffset() + "-" + problem.range().getEndOffset();
-            if (!seen.add(key)) {
+        for (SkillProblem problem : ruleRunner.run(skillFile)) {
+            if (isDuplicateDaemonProblem(file, problem)) {
                 continue;
             }
-            descriptors.add(toDescriptor(file, manager, isOnTheFly, problem));
+            holder.registerProblem(
+                holder.getManager().createProblemDescriptor(
+                    file,
+                    TextRangeUtil.clamp(problem.range(), file.getTextLength()),
+                    problem.message(),
+                    toHighlightType(problem.severity()),
+                    isOnTheFly,
+                    toQuickFixes(problem.fixTypes())
+                )
+            );
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SkillMdInspection.checkFile: file=" + file.getName()
-                + " onTheFly=" + isOnTheFly
-                + " rawProblems=" + problems.size()
-                + " uniqueDescriptors=" + descriptors.size());
-        }
-        return descriptors.toArray(ProblemDescriptor.EMPTY_ARRAY);
     }
 
     /**
-     * 将内部问题模型转换为 IntelliJ ProblemDescriptor
+     * 判断当前 problem 是否是 IDE 外层重复 daemon 会话产生的同一条 descriptor.
+     *
+     * @param file    被检查的 SKILL.md
+     * @param problem 规则层输出的问题
+     * @return true 表示短时间内同一文件版本已注册过完全相同的问题, 本次应跳过
+     */
+    private static boolean isDuplicateDaemonProblem(@NotNull PsiFile file, @NotNull SkillProblem problem) {
+        long now = System.currentTimeMillis();
+        cleanupRecentProblemKeys(now);
+
+        String key = duplicateKey(file, problem);
+        Long previous = RECENT_PROBLEM_KEYS.putIfAbsent(key, now);
+        if (previous == null) {
+            return false;
+        }
+        if (now - previous <= DUPLICATE_SUPPRESSION_WINDOW_MILLIS) {
+            return true;
+        }
+        RECENT_PROBLEM_KEYS.put(key, now);
+        return false;
+    }
+
+    /**
+     * 构造跨 inspection 会话稳定的 problem key.
      */
     @NotNull
-    private ProblemDescriptor toDescriptor(@NotNull PsiFile file,
-                                           @NotNull InspectionManager manager,
-                                           boolean isOnTheFly,
-                                           @NotNull SkillProblem problem) {
-        return manager.createProblemDescriptor(
-            file,
-            TextRangeUtil.clamp(problem.range(), file.getTextLength()),
-            problem.message(),
-            toHighlightType(problem.severity()),
-            isOnTheFly,
-            toQuickFixes(problem.fixTypes())
+    private static String duplicateKey(@NotNull PsiFile file, @NotNull SkillProblem problem) {
+        VirtualFile virtualFile = file.getVirtualFile();
+        String path = virtualFile == null ? file.getName() : virtualFile.getPath();
+        long modificationStamp = file.getViewProvider().getModificationStamp();
+        return path + "#" + modificationStamp
+            + "#" + problem.ruleId()
+            + "@" + problem.range().getStartOffset() + "-" + problem.range().getEndOffset()
+            + "#" + problem.message();
+    }
+
+    /**
+     * 控制静态防抖表大小, 避免长时间 IDE 会话中积累无用 key.
+     */
+    private static void cleanupRecentProblemKeys(long now) {
+        RECENT_PROBLEM_KEYS.entrySet().removeIf(
+            entry -> now - entry.getValue() > DUPLICATE_SUPPRESSION_WINDOW_MILLIS
         );
     }
 
@@ -136,7 +168,7 @@ public class SkillMdInspection extends LocalInspectionTool {
     @NotNull
     private ProblemHighlightType toHighlightType(@NotNull SkillSeverity severity) {
         return switch (severity) {
-            case ERROR -> ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
+            case ERROR -> ProblemHighlightType.ERROR;
             case WARNING -> ProblemHighlightType.WARNING;
             case WEAK_WARNING -> ProblemHighlightType.WEAK_WARNING;
         };

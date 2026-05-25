@@ -19,12 +19,10 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.util.FileContentUtil;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,7 +128,7 @@ public class ValidateCurrentSkillFileAction extends AnAction {
     }
 
     /**
-     * 在 EDT 上发布结果: 触发 daemon 重启 (Problems View 自动刷新) + 激活 Problems View + 弹通知.
+     * 在 EDT 上发布结果: 触发一次 daemon 重启 (Problems View 自动刷新) + 激活 Problems View + 弹通知.
      * <p>通知文案设计:
      * <ul>
      *   <li>文件标签用"父目录名/SKILL.md", 否则多个 skill 都叫 SKILL.md, 用户看不出校验的是哪个;</li>
@@ -144,11 +142,8 @@ public class ValidateCurrentSkillFileAction extends AnAction {
         if (project.isDisposed() || !result.valid) {
             return;
         }
-        // 关键: 强制 Markdown PSI 完整重解析, 再 restart daemon.
-        // 仅 restart 不够: 如果文件在 Markdown frontmatter 节点懒构建之前已经被 daemon 跑过一次,
-        // 旧的 ProblemDescriptor 会被缓存在 Problems View. PSI 节点结构变化但 document 没变,
-        // restart 不会让 daemon 重新拿到"新 PSI"的视角. reparseFiles 才能彻底刷新.
-        FileContentUtil.reparseFiles(project, Collections.singletonList(vf), true);
+        // 只重启当前文件的 daemon pass. 不主动 reparse Markdown PSI, 避免一次按钮校验制造
+        // "reparse + restart" 两轮 inspection 调度, 导致 Problems View 出现重复条目.
         if (result.psiFile != null && result.psiFile.isValid()) {
             DaemonCodeAnalyzer.getInstance(project).restart(result.psiFile);
         }

@@ -65,12 +65,12 @@ public final class FrontMatterParser {
     @NotNull
     public static FrontMatterParseResult parse(@NotNull PsiFile psiFile) {
         String text = psiFile.getText();
-        PsiElement frontMatterElement = findFrontMatterElement(psiFile);
+        PsiElement frontMatterElement = findFrontMatterElement(psiFile, leadingFrontMatterOffset(text));
         int offsetAdjustment = 0;
         if (frontMatterElement == null && text.startsWith("\uFEFF")) {
             PsiFile withoutBom = PsiFileFactory.getInstance(psiFile.getProject())
                 .createFileFromText("SKILL.md", psiFile.getLanguage(), text.substring(1));
-            frontMatterElement = findFrontMatterElement(withoutBom);
+            frontMatterElement = findFrontMatterElement(withoutBom, 0);
             offsetAdjustment = 1;
         }
         if (frontMatterElement == null) {
@@ -194,23 +194,34 @@ public final class FrontMatterParser {
     }
 
     /**
-     * 查找 Markdown PSI 中的 frontmatter 节点
+     * 查找 Markdown PSI 中位于文件开头的 frontmatter 节点.
+     * <p>Markdown PSI 也可能在正文的 {@code ```markdown} 示例里识别出 FRONT_MATTER.
+     * Skill 规范只允许文件级 YAML frontmatter, 所以这里只接受起始偏移等于文件开头
+     * (或 BOM 之后) 的节点, 防止正文示例污染结构校验.
      */
-    private static PsiElement findFrontMatterElement(@NotNull PsiElement element) {
+    private static PsiElement findFrontMatterElement(@NotNull PsiElement element, int expectedStartOffset) {
         ASTNode node = element.getNode();
         if (node != null) {
             String elementType = node.getElementType().toString().toUpperCase(Locale.ROOT);
-            if (elementType.contains("FRONT_MATTER")) {
+            if (elementType.contains("FRONT_MATTER")
+                && element.getTextRange().getStartOffset() == expectedStartOffset) {
                 return element;
             }
         }
         for (PsiElement child : element.getChildren()) {
-            PsiElement frontMatter = findFrontMatterElement(child);
+            PsiElement frontMatter = findFrontMatterElement(child, expectedStartOffset);
             if (frontMatter != null) {
                 return frontMatter;
             }
         }
         return null;
+    }
+
+    /**
+     * 返回合法 frontmatter PSI 节点应处在的起始偏移.
+     */
+    private static int leadingFrontMatterOffset(@NotNull String text) {
+        return text.startsWith("\uFEFF") ? 1 : 0;
     }
 
     /**

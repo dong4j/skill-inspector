@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 方案 B 的启动入口: 应用级生命周期监听器, 在 IDE 主窗口出现后挂载全局
+ * 浮动按钮的启动入口: 应用级生命周期监听器, 在 IDE 主窗口出现后挂载全局
  * {@link EditorFactoryListener}, 把 {@link SkillBottomFloatingButton#attach}
  * 拼接到每个新创建的编辑器上.
  *

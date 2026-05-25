@@ -65,7 +65,7 @@ import dev.dong4j.idea.skill.inspector.util.SkillInspectorBundle;
 import icons.SkillInspectorIcons;
 
 /**
- * SKILL.md 编辑器右下角浮动按钮 (方案 B: 自定义 Swing 注入 + 毛玻璃质感)
+ * SKILL.md 编辑器右下角浮动按钮 (自定义 Swing 注入 + 毛玻璃质感)
  *
  * <p>视觉设计: 圆角矩形 + icon + 文本, 毛玻璃 (frosted glass) 背景, 与 macOS Control Center / iOS
  * 控件视觉一致, 在编辑器文本上有"浮动"质感. 比纯色填充更显眼又不喧宾夺主.

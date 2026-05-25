@@ -272,8 +272,26 @@ V1 收尾后，右键菜单的 `Validate Skill` Action 已经实化：
 
 ---
 
-*最后更新: 2026-05-25 - V1 体验增强：floating/ 包内新增方案 B（SkillBottomFloatingButton + SkillBottomFloatingInstaller），自定义右下角圆形 FAB 与方案 A 官方右上角浮动栏并存对比；PluginContents 抽出 ACTION_VALIDATE_SKILL_ID 常量供 floating 复用*
+*最后更新: 2026-05-25 - 浮动按钮收敛：移除官方 `editorFloatingToolbarProvider` 路径（含 `SkillFloatingToolbarProvider` 与 `SkillFloatingGroup` ActionGroup），保留唯一实现 `SkillBottomFloatingButton` + `SkillBottomFloatingInstaller`（右下角自定义毛玻璃 FAB）；点击触发 `ValidateCurrentSkillFileAction` 仅校验当前文件*
 
-*2026-05-25 - V1 体验增强：新增 floating/ 包，引入官方 FloatingToolbarProvider PoC（方案 A），SKILL.md 编辑器右上角悬停浮动按钮*
+*2026-05-25 - V1 体验增强（PoC 阶段）：floating/ 包内并行两套浮动按钮方案（官方 FloatingToolbarProvider vs 自定义 Swing FAB）做产品对比；PluginContents 抽出 Action ID 常量供 floating 模块复用*
 
 *2026-05-23 - V1 收尾：实化 SkillInspectorAction、补 ResourceRules（resource.unused-reference + script.missing-usage）、reference-style links 测试用例、状态栏图标交互精简*
+
+
+<claude-mem-context>
+# Memory Context
+
+# claude-mem status
+
+This project has no memory yet. The current session will seed it; subsequent sessions will receive auto-injected context for relevant past work.
+
+Memory injection starts on your second session in a project.
+
+`/learn-codebase` is available if the user wants to front-load the entire repo into memory in a single pass (~5 minutes on a typical repo, optional). Otherwise memory builds passively as work happens.
+
+Live activity: http://localhost:37701
+How it works: `/how-it-works`
+
+This message disappears once the first observation lands.
+</claude-mem-context>

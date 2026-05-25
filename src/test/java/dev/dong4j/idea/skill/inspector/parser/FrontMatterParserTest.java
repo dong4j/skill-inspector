@@ -238,6 +238,31 @@ class FrontMatterParserTest {
     }
 
     /**
+     * 回归测试: 正文中的 Markdown 示例可能包含自己的 YAML frontmatter, 但它只是代码块内容.
+     * 文件级 frontmatter 必须只认文件开头, 不能递归命中 fenced code block 里的 FRONT_MATTER PSI.
+     */
+    @Test
+    void shouldIgnoreFrontMatterInsideMarkdownCodeFence() {
+        String text = """
+            # Skill Examples
+
+            ```markdown
+            ---
+            name: nested-example
+            description: This is only a fenced code example.
+            ---
+            # Nested Example
+            ```
+            """;
+
+        FrontMatterParseResult result = parse(text);
+
+        assertThat(result.frontMatter()).isNull();
+        assertThat(result.body().text()).isEqualTo(text);
+        assertThat(result.body().startOffset()).isZero();
+    }
+
+    /**
      * 使用 Markdown 插件 PSI 创建测试文件, 覆盖生产路径解析逻辑。
      */
     private FrontMatterParseResult parse(String text) {
