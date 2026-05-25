@@ -5,6 +5,8 @@ Skill Inspector 是一个面向 JetBrains IDE 的 Agent Skill 规范检查插件
 
 当前版本聚焦一件事：让 `SKILL.md` 像代码一样在 IDEA 中具备实时 Inspection、Problems 展示、手动校验和 Quick Fix 能力。
 
+![img.png](img.png)
+
 ## 背景
 
 Agent Skills 正在被 Claude Code、Codex、GitHub Copilot、JetBrains Junie、Cursor
