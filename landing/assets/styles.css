@@ -1320,9 +1320,9 @@ section:first-of-type { border-top: 0; }
 .final-cta-meta span:first-child::before { content: ''; margin-right: 0; }
 
 /* ============================================================
- * 13. Footer (Colophon)
+ * 13. Footer
  *
- *   学术 / 出版物风的页脚: 多列链接 + 底部 colophon (字体说明 / 协议).
+ *   学术 / 出版物风的页脚: 多列链接 + 底部版权 + 受众价值主张.
  * ============================================================ */
 .site-footer {
   padding: var(--space-16) 0 var(--space-8);
@@ -1390,21 +1390,6 @@ section:first-of-type { border-top: 0; }
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--ink-mid);
-}
-
-.colophon {
-  font-style: italic;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  color: var(--ink-mid);
-  letter-spacing: 0.005em;
-}
-
-.colophon em {
-  font-style: normal;
-  color: var(--rule);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
 }
 
 /* ============================================================

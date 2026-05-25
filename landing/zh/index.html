@@ -12,19 +12,19 @@
     - lang="zh-Hans" 触发 styles.css 里中文字距 / 行距修正 (如有)
 -->
 <html lang="zh-Hans">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F7F4ED">
 
     <title>Skill Inspector — 一个面向 SKILL.md 的 Lint 工具, 就在 JetBrains IDE 里 | dong4j</title>
     <meta
-      name="description"
-      content="一个 JetBrains IDE 插件, 让 SKILL.md 像代码一样接受实时 Lint 检查. 基于 Agent Skills 官方规范的 30+ 条规则, 覆盖结构 / 质量 / 引用 / 安全 / 资源五个维度, 提供 Quick Fix 与 Problems 面板集成, 零第三方依赖."
+            name="description"
+            content="一个 JetBrains IDE 插件, 让 SKILL.md 像代码一样接受实时 Lint 检查. 基于 Agent Skills 官方规范的 30+ 条规则, 覆盖结构 / 质量 / 引用 / 安全 / 资源五个维度, 提供 Quick Fix 与 Problems 面板集成, 零第三方依赖."
     >
     <meta
-      name="keywords"
-      content="Skill Inspector, Agent Skills, SKILL.md, JetBrains 插件, IntelliJ 插件, markdown lint, frontmatter 校验, agent skills 规范"
+            name="keywords"
+            content="Skill Inspector, Agent Skills, SKILL.md, JetBrains 插件, IntelliJ 插件, markdown lint, frontmatter 校验, agent skills 规范"
     >
     <meta name="author" content="dong4j">
 
@@ -32,8 +32,8 @@
     <meta property="og:locale" content="zh_CN">
     <meta property="og:title" content="Skill Inspector — 一个面向 SKILL.md 的 Lint 工具">
     <meta
-      property="og:description"
-      content="实时检查 Agent Skills (SKILL.md). 30+ 条规则覆盖结构 / 质量 / 引用 / 安全 / 资源, 提供 Quick Fix 与 Problems 面板集成."
+            property="og:description"
+            content="实时检查 Agent Skills (SKILL.md). 30+ 条规则覆盖结构 / 质量 / 引用 / 安全 / 资源, 提供 Quick Fix 与 Problems 面板集成."
     >
     <meta property="og:image" content="../assets/plugin-icon.svg">
 
@@ -53,876 +53,926 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
     >
 
     <link rel="stylesheet" href="../assets/styles.css">
-  </head>
+</head>
 
-  <body>
-    <header class="site-header" data-scrolled="false">
-      <div class="container nav">
+<body>
+<header class="site-header" data-scrolled="false">
+    <div class="container nav">
         <a href="#top" class="brand" aria-label="Skill Inspector 首页">
           <span class="brand-mark" aria-hidden="true">
             <img src="../assets/plugin-icon.svg" alt="">
           </span>
-          <span class="brand-name">
+            <span class="brand-name">
             <span>Skill Inspector</span>
             <span class="brand-version">v2026.1</span>
           </span>
         </a>
 
         <nav aria-label="主导航">
-          <ul class="nav-links">
-            <li><a href="#rules">规则</a></li>
-            <li><a href="#features">功能</a></li>
-            <li><a href="#diffs">示例</a></li>
-            <li><a href="#faq">常见问题</a></li>
-          </ul>
+            <ul class="nav-links">
+                <li><a href="#rules">规则</a></li>
+                <li><a href="#features">功能</a></li>
+                <li><a href="#diffs">示例</a></li>
+                <li><a href="#faq">常见问题</a></li>
+            </ul>
         </nav>
 
         <div class="nav-actions">
-          <div class="lang-switch" role="group" aria-label="语言切换">
-            <a href="../">EN</a>
-            <a href="./" aria-current="true">中文</a>
-          </div>
-          <a
-            class="nav-cta"
-            href="https://plugins.jetbrains.com/plugin/31938"
-            target="_blank"
-            rel="noopener"
-          >
-            安装
-          </a>
+            <div class="lang-switch" role="group" aria-label="语言切换">
+                <a href="../">EN</a>
+                <a href="./" aria-current="true">中文</a>
+            </div>
+            <a
+                    class="nav-cta"
+                    href="https://plugins.jetbrains.com/plugin/31938"
+                    target="_blank"
+                    rel="noopener"
+            >
+                安装
+            </a>
         </div>
-      </div>
-    </header>
+    </div>
+</header>
 
-    <main id="top">
-      <!-- ================================================================
-           §1 Hero
-           ================================================================ -->
-      <section class="hero">
-        <div class="container hero-grid">
-          <div>
-            <div class="hero-eyebrow">
-              <span class="section-num">§1 · 引言</span>
-            </div>
-
-            <h1 class="hero-title">
-              一个面向
-              <em><span class="underdash">SKILL.md</span> 的</em>
-              Lint 工具.
-              <em>就在 IDE 里.</em>
-            </h1>
-
-            <p class="hero-lead">
-              Skill Inspector 是一个 JetBrains IDE 插件, 把每一份
-              <code>SKILL.md</code> 当成一等公民的可检查文档 —
-              实时检查、Quick Fix、Problems 面板集成, 全部基于
-              <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;官方规范</a>,
-              零第三方依赖.
-            </p>
-
-            <div class="hero-cta">
-              <a
-                class="btn btn-primary btn-lg"
-                href="https://plugins.jetbrains.com/plugin/31938"
-                target="_blank"
-                rel="noopener"
-              >
-                到 Marketplace 安装 →
-              </a>
-              <a
-                class="btn btn-ghost btn-lg"
-                href="https://github.com/dong4j/skill-inspector"
-                target="_blank"
-                rel="noopener"
-              >
-                在 GitHub 查看源码
-              </a>
-            </div>
-          </div>
-
-          <!-- Marginalia 右栏: 杂志页眉式元数据 -->
-          <aside aria-label="插件元数据">
-            <dl class="marginalia">
-              <div>
-                <dt>已实现规则</dt>
-                <dd><strong>30<span class="em">+</span></strong></dd>
-              </div>
-              <div>
-                <dt>分类</dt>
-                <dd><strong>5</strong> 结构 · 质量 · 引用 · 安全 · 资源</dd>
-              </div>
-              <div>
-                <dt>第三方依赖</dt>
-                <dd><strong>0</strong> 纯 IntelliJ Platform API</dd>
-              </div>
-              <div>
-                <dt>协议</dt>
-                <dd>MIT, 永久免费</dd>
-              </div>
-              <div>
-                <dt>兼容性</dt>
-                <dd>IntelliJ IDEA <span class="mono">2024.2 — 2026.1</span></dd>
-              </div>
-              <div>
-                <dt>运行环境</dt>
-                <dd>Java 21</dd>
-              </div>
-            </dl>
-          </aside>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §2 规则清单
-           ================================================================ -->
-      <section id="rules">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§2 · 清单</div>
-              <div class="meta-line">所有规则, 公开在案.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                三十条规则. 五个分类. <em>一份有立场的基准.</em>
-              </h2>
-              <p class="section-lead">
-                规则按 "确定性 + 风险" 分组, 和 IDEA 处理 Inspection 结果的方式一致.
-                每条规则都有一个稳定的 ID — 可引用、可禁用、可上报 —
-                绝不藏在不透明的 "AI 这么说" 启发式里.
-              </p>
-            </div>
-          </header>
-
-          <div class="rules-table-wrap reveal">
-            <table class="rules-table" aria-label="精选 Inspection 规则">
-              <thead>
-                <tr>
-                  <th class="col-num">#</th>
-                  <th class="col-id">Rule ID</th>
-                  <th>严重度</th>
-                  <th>说明</th>
-                  <th class="col-fix">Quick Fix</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="col-num">2.01</td>
-                  <td class="col-id"><code>frontmatter.missing</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">缺 YAML frontmatter; 跳过后续所有字段检查.</td>
-                  <td class="col-fix has-fix">ADD_FRONT_MATTER</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.02</td>
-                  <td class="col-id"><code>frontmatter.name.mismatch</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc"><code>name</code> 字段与父目录名不一致.</td>
-                  <td class="col-fix has-fix">SYNC_NAME_WITH_DIRECTORY</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.03</td>
-                  <td class="col-id"><code>frontmatter.name.invalid</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc"><code>name</code> 不符合 <code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>.</td>
-                  <td class="col-fix has-fix">CONVERT_NAME_TO_KEBAB</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.04</td>
-                  <td class="col-id"><code>frontmatter.description.missing</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">缺失或为空的 <code>description</code>; Agent 无法触发.</td>
-                  <td class="col-fix has-fix">ADD_DESCRIPTION</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.05</td>
-                  <td class="col-id"><code>description.too-generic</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">Description 是 <code>helper</code> / <code>tool</code> / <code>skill</code> / <code>assistant</code> / <code>utility</code> 之一.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.06</td>
-                  <td class="col-id"><code>description.missing-usage</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">没有触发短语 (<em>"use when"</em>、<em>"使用"</em> 等).</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.07</td>
-                  <td class="col-id"><code>reference.missing-file</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">相对链接指向的文件在磁盘上不存在.</td>
-                  <td class="col-fix has-fix">CREATE_MISSING_REFERENCE</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.08</td>
-                  <td class="col-id"><code>reference.case-mismatch</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">链接大小写与磁盘项不一致 (迁到 Linux 后会断).</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.09</td>
-                  <td class="col-id"><code>resource.unused-reference</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc"><code>references/</code> 下的文件从未被 <code>SKILL.md</code> 引用.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.10</td>
-                  <td class="col-id"><code>security.dangerous-command</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">正文中出现 <code>rm -rf /</code> 或管道式 <code>curl … | sh</code>.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.11</td>
-                  <td class="col-id"><code>security.secret-pattern</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">疑似 <code>api_key</code> / <code>token</code> / <code>secret</code> / <code>password</code> 字段或高熵值.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.12</td>
-                  <td class="col-id"><code>security.sensitive-path</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">正文引导访问 <code>~/.ssh</code>、<code>.env</code>、<code>~/.aws</code>.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- 5 类规则 tally -->
-          <div class="rules-tally reveal-stagger">
-            <div class="tally-item">
-              <div class="tally-cat">结构</div>
-              <div class="tally-num">11<em>·</em></div>
-              <div class="tally-label">Error · frontmatter / 命名 / 长度</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">质量</div>
-              <div class="tally-num">6<em>·</em></div>
-              <div class="tally-label">Warning · 描述 / 正文 / 触发语</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">引用</div>
-              <div class="tally-num">4<em>·</em></div>
-              <div class="tally-label">Warning · 链接 / 路径 / 大小写</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">安全</div>
-              <div class="tally-num">5<em>·</em></div>
-              <div class="tally-label">Error · 密钥 / 危险命令</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">资源</div>
-              <div class="tally-num">2<em>·</em></div>
-              <div class="tally-label">Warning · 未引用 / 脚本</div>
-            </div>
-          </div>
-
-          <p class="rules-cta reveal">
-            ↳ 完整表格 (含严重度与 Quick Fix 映射) 见
-            <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
-          </p>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §3 能力
-           ================================================================ -->
-      <section id="features">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§3 · 能力</div>
-              <div class="meta-line">插件做的六件事, 一一道来.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                不是套壳的通用 Lint. <em>从头到尾, Agent-Skills aware.</em>
-              </h2>
-              <p class="section-lead">
-                每项能力都对应一种真实的 <code>SKILL.md</code> 写作痛点:
-                漏字段直接上线、相对链接断裂、悄悄混进危险脚本片段、
-                description 模糊到 Agent 没法触发.
-              </p>
-            </div>
-          </header>
-
-          <div class="features-list reveal-stagger">
-            <article class="feature">
-              <div class="feature-num">01</div>
-              <h3 class="feature-title">实时 <em>Inspection.</em></h3>
-              <div class="feature-body">
-                <p>
-                  注册了一个 <code>LocalInspectionTool</code>, 自动绑定到每一份
-                  <code>SKILL.md</code> 文件 (严格按文件名 gate, 其他 Markdown
-                  完全不受影响). 错误和警告实时显示在编辑器 gutter 和 Problems
-                  面板 — 体验跟 Kotlin / Java 文件完全一致.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">02</div>
-              <h3 class="feature-title">保守的 <em>Quick Fix.</em></h3>
-              <div class="feature-body">
-                <p>
-                  添加缺失的 frontmatter、把 <code>name</code> 同步到父目录、
-                  转成 kebab-case、为缺失的引用创建占位文件 — 一次
-                  <kbd>Alt</kbd>+<kbd>Enter</kbd> 即可. 插件永远不会自动改写你的正文.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">03</div>
-              <h3 class="feature-title">全项目 <em>扫描.</em></h3>
-              <div class="feature-body">
-                <p>
-                  右键 → <em>Validate&nbsp;Skill</em>. 后台任务通过
-                  <code>FilenameIndex</code> 扫描所有 <code>SKILL.md</code>,
-                  汇总 Error / Warning 总数并跳转到第一个出错文件. 也可以在 CI
-                  中以 headless inspection 形式跑同一套规则.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">04</div>
-              <h3 class="feature-title">默认 <em>规范优先.</em></h3>
-              <div class="feature-body">
-                <p>
-                  所有规则锚定在
-                  <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;官方规范</a>,
-                  不锚定任何单一 Agent 的私有扩展. Agent 特定的差异在 V2 以
-                  兼容性提示形式补充, 永远不作为默认错误. 你的 skill 保持可移植.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">05</div>
-              <h3 class="feature-title">状态栏 <em>开关.</em></h3>
-              <div class="feature-body">
-                <p>
-                  状态栏自带一个 widget, 一键开关整个 Inspection —
-                  不用钻进 <em>Settings → Inspections</em>. 细粒度调节走
-                  <em>Tools → Skill Inspector</em>.
-                </p>
-                <a class="read-more" href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
-                  规则手册 →
-                </a>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">06</div>
-              <h3 class="feature-title">零 <em>依赖.</em></h3>
-              <div class="feature-body">
-                <p>
-                  纯 IntelliJ Platform API — 不引入任何第三方插件库, 无 telemetry,
-                  无远程调用. 内网 / 涉密环境完全可用; 想验证的话直接
-                  <code>jar -tf</code> 看插件 zip 内含什么.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §4 示例 (Code diff gallery)
-           ================================================================ -->
-      <section id="diffs">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§4 · 示例</div>
-              <div class="meta-line">修复前 · 修复后, 三个真实案例.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                修好后的 <code class="mono">SKILL.md</code> <em>到底长什么样.</em>
-              </h2>
-              <p class="section-lead">
-                下面三对最小示例来自上面的规则清单. 每一对左边是触发规则的输入,
-                右边是按一次 <kbd>Alt</kbd>+<kbd>Enter</kbd> 之后的样子.
-              </p>
-            </div>
-          </header>
-
-          <div class="diff-grid reveal-stagger">
-            <!-- Diff 1 -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">frontmatter.name.mismatch</div>
-                <h3 class="diff-h"><em>name</em> 必须等于目录名.</h3>
-                <p class="diff-cap-body">
-                  Agent 通过目录名来发现 skill. 如果 <code>name</code> 漂移了
-                  (snake_case、大小写、拼错), 这个 skill 就再也无法被寻址.
-                  <span class="fix">Quick Fix · SYNC_NAME_WITH_DIRECTORY</span>
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— 修复前</span><span>code-reviewer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line del"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vr">code_reviewer</span></span></div>
-                    <div class="diff-line"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ 修复后</span><span>code-reviewer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line add"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vg">code-reviewer</span></span></div>
-                    <div class="diff-line"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Diff 2 -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">frontmatter.description.missing</div>
-                <h3 class="diff-h">没有 <em>description,</em> Agent 没法触发.</h3>
-                <p class="diff-cap-body">
-                  <code>description</code> 是 Agent 发现 loader 读取的第一道字段,
-                  在加载正文之前. 留空 = 在每个 prompt 上对每个 Agent 都不可见.
-                  <span class="fix">Quick Fix · ADD_DESCRIPTION</span>
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— 修复前</span><span>commit-helper/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span></div>
-                    <div class="diff-line del"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vr"></span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ 修复后</span><span>commit-helper/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span></div>
-                    <div class="diff-line add"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vg">Use when generating a commit message from staged changes.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Diff 3 -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">security.dangerous-command</div>
-                <h3 class="diff-h">有些事就不能 <em>自动修.</em></h3>
-                <p class="diff-cap-body">
-                  安全规则只定位上报, 绝不自动改写. 管道式 <code>curl … | sh</code>
-                  会被精准定位到具体 text range — 该 pin hash、该换源、还是该
-                  接受风险加 <code>noinspection</code>, 由你决定.
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— 被标记</span><span>installer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span></div>
-                    <div class="diff-line"><span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span></div>
-                    <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span></div>
-                    <div class="diff-line del"><span class="ln">10</span><span class="marker"></span><span class="code"><span class="vr">    curl https://x.example/install.sh | sh</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ 建议改写</span><span>installer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span></div>
-                    <div class="diff-line"><span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span></div>
-                    <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span></div>
-                    <div class="diff-line add"><span class="ln">10</span><span class="marker"></span><span class="code"><span class="vg">    curl -fsSL https://x.example/install.sh -o /tmp/install.sh</span></span></div>
-                    <div class="diff-line add"><span class="ln">11</span><span class="marker"></span><span class="code"><span class="vg">    sha256sum -c install.sh.sha256 &amp;&amp; sh /tmp/install.sh</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §5 适用人群
-           ================================================================ -->
-      <section id="personas">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§5 · 受众</div>
-              <div class="meta-line">四个场景, 不编造引用.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                插件围绕 <em>四类真实受众</em> 设计.
-              </h2>
-              <p class="section-lead">
-                在项目积累更多真实用户之前, 这是 Skill Inspector 设计时优先服务的
-                场景. 我们拒绝用 stock 头像编造客户引言 — 等到真实用户开口,
-                下面的引述就会逐字替换.
-              </p>
-            </div>
-          </header>
-
-          <div class="personas reveal-stagger">
-            <article class="persona">
-              <p class="persona-quote">
-                我希望 <code>SKILL.md</code> 在 commit <em>之前</em>就大声报错.
-              </p>
-              <div class="persona-cite">Skill 作者</div>
-              <p class="persona-body">
-                在 IDEA 里打开文件. 缺必填字段、目录名漂移、相对链接断裂 —
-                都会在你 push 之前出现在 gutter 上. 按
-                <kbd>Alt</kbd>+<kbd>Enter</kbd> 应用确定性修复; 正文仍然归你.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                团队为多个 Agent 写 skill, 我要 <em>一致的质量门槛.</em>
-              </p>
-              <div class="persona-cite">团队负责人</div>
-              <p class="persona-body">
-                所有开发者的 IDE 看到的 Inspection 结果完全一致 — 因为规则装在插件里,
-                不在个人 config 里. CI 也可以在每个 PR 上 headless 跑同一套
-                <em>Validate Skill</em>, 不合规的 skill 不会进 <code>main</code>.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                我发布 skill 包, 不希望 reviewer 把时间花在 <em>机械错误</em> 上.
-              </p>
-              <div class="persona-cite">开源维护者</div>
-              <p class="persona-body">
-                结构 / 质量 / 引用类规则自动 catch 那些无聊的事情 —
-                name 不匹配、死链、过宽的描述、
-                <code>references/</code> 下没人引用的文件. Reviewer
-                可以专心看 <strong>内容</strong>, 而不是格式.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                我要知道 skill 里有没有 <code>curl … | sh</code>, 有没有 <em>泄密.</em>
-              </p>
-              <div class="persona-cite">安全敏感的企业</div>
-              <p class="persona-body">
-                安全规则会标记危险命令、疑似 API key、高熵字符串、
-                敏感路径 (<code>~/.ssh</code>、<code>.env</code>) 以及
-                prompt-injection 文案. V1 只定位上报, 绝不自动改写 —
-                决定权永远在人手上.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §6 常见问题
-           ================================================================ -->
-      <section id="faq">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§6 · 问答</div>
-              <div class="meta-line">有出处的诚实回答.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                安装前的 <em>八个问题.</em>
-              </h2>
-            </div>
-          </header>
-
-          <div class="faq-list reveal-stagger">
-            <article class="faq-item">
-              <div class="faq-num">§6.1</div>
-              <details class="faq-content">
-                <summary>支持哪些 IDE 版本?</summary>
-                <div class="faq-body">
-                  IntelliJ IDEA Community / Ultimate <strong>2024.2 → 2026.1</strong>
-                  是官方基线 — 插件声明
-                  <code>sinceBuild = 242.2</code>、<code>untilBuild = 261.*</code>.
-                  CI 在 IC/IU 2024.2、2024.3、2025.1、2025.2、2025.3 上完成构建与验证;
-                  2026.1 在声明的兼容性范围内. 同平台的其他 JetBrains IDE
-                  (PyCharm / GoLand / WebStorm 等) 通常也能在这个 build range 内工作,
-                  但只有 IDEA 经过 CI 测试.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.2</div>
-              <details class="faq-content">
-                <summary>目前实现了哪些规则? 完整列表在哪?</summary>
-                <div class="faq-body">
-                  共 5 个分类 — <strong>结构 Structural</strong> (11 条)、
-                  <strong>质量 Quality</strong> (6 条)、
-                  <strong>引用 Reference</strong> (4 条)、
-                  <strong>安全 Security</strong> (5 条)、
-                  <strong>资源 Resource</strong> (2 条).
-                  每条都有稳定的 rule ID, 例如 <code>frontmatter.name.mismatch</code>
-                  或 <code>security.dangerous-command</code>. 完整表格见
-                  <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.3</div>
-              <details class="faq-content">
-                <summary>有 telemetry 吗?</summary>
-                <div class="faq-body">
-                  没有. 无埋点、无 analytics、无远程调用. 插件只读取项目里的
-                  <code>SKILL.md</code>, 所有 Inspection 都在本地完成,
-                  适用于完全离线 / 涉密环境.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.4</div>
-              <details class="faq-content">
-                <summary>"Quick Fix" 具体会自动改什么?</summary>
-                <div class="faq-body">
-                  只做确定性、保守的修复:
-                  <strong>添加缺失的 frontmatter</strong>、
-                  <strong>添加 <code>name</code> 字段</strong>、
-                  <strong>把 <code>name</code> 同步到父目录</strong>、
-                  <strong>把 <code>name</code> 转为 kebab-case</strong>、
-                  <strong>添加 <code>description</code> 占位</strong>、
-                  <strong>为缺失引用创建空文件 (含父目录)</strong>.
-                  插件永远不会自动改写你的正文.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.5</div>
-              <details class="faq-content">
-                <summary>它和普通 Markdown lint 有什么区别?</summary>
-                <div class="faq-body">
-                  Skill Inspector 是 <em>Agent-Skills aware</em> 的.
-                  它把 YAML frontmatter 解析成真正的
-                  <code>SkillFrontMatter</code> 领域 record, 知道
-                  <code>name</code> 必须等于父目录名, 校验 skill 目录内的相对链接
-                  (含跨平台大小写检查), 还会扫描安全风险.
-                  这些通用 Markdown lint 工具都做不到.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.6</div>
-              <details class="faq-content">
-                <summary>只对文件名严格等于 <code>SKILL.md</code> 的文件生效?</summary>
-                <div class="faq-body">
-                  是的. Inspection 第一道关就是
-                  <code>PsiFile.getName().equals("SKILL.md")</code>.
-                  这保证 <code>readme.md</code>、<code>notes.md</code>
-                  等其他 Markdown 文件完全不受影响 —
-                  不打开 skill 文件就感受不到这个插件.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.7</div>
-              <details class="faq-content">
-                <summary>能临时关掉所有 Inspection 吗?</summary>
-                <div class="faq-body">
-                  可以. 状态栏 widget 一键开关, 不用去
-                  <em>Settings → Inspections</em> 里找. 需要细调时, 走
-                  <em>Tools → Skill Inspector</em> 设置页.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.8</div>
-              <details class="faq-content">
-                <summary>开源吗? 什么协议?</summary>
-                <div class="faq-body">
-                  开源, <strong>MIT</strong> 协议, 源码在
-                  <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">GitHub</a>.
-                  欢迎 issue / PR / 新规则贡献, 贡献指南见
-                  <a href="https://github.com/dong4j/skill-inspector/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.
-                </div>
-              </details>
-            </article>
-          </div>
-        </div>
-      </section>
-    </main>
-
+<main id="top">
     <!-- ================================================================
-         §7 Final CTA
+         §1 Hero
          ================================================================ -->
-    <section class="final-cta" aria-label="获取插件">
-      <div class="container final-cta-inner">
-        <div>
-          <h2 class="final-cta-title">
-            别再发布有问题的 <em>SKILL.md</em> 了.
-          </h2>
-          <p class="final-cta-sub">
-            到 JetBrains Marketplace 安装, 打开任意包含
-            <code class="mono">SKILL.md</code> 的项目, 检查结果会在同一秒出现.
-            全部上手成本就是这一步.
-          </p>
-          <div class="final-cta-meta">
-            <span>MIT 协议</span>
-            <span>Java 21</span>
-            <span>IntelliJ 2024.2 → 2026.1</span>
-            <span>v2026.1.1000</span>
-          </div>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <div class="hero-eyebrow">
+                    <span class="section-num">§1 · 引言</span>
+                </div>
+
+                <h1 class="hero-title">
+                    一个面向
+                    <em><span class="underdash">SKILL.md</span> 的</em>
+                    Lint 工具.
+                    <em>就在 IDE 里.</em>
+                </h1>
+
+                <p class="hero-lead">
+                    Skill Inspector 是一个 JetBrains IDE 插件, 把每一份
+                    <code>SKILL.md</code> 当成一等公民的可检查文档 —
+                    实时检查、Quick Fix、Problems 面板集成, 全部基于
+                    <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;官方规范</a>,
+                    零第三方依赖.
+                </p>
+
+                <div class="hero-cta">
+                    <a
+                            class="btn btn-primary btn-lg"
+                            href="https://plugins.jetbrains.com/plugin/31938"
+                            target="_blank"
+                            rel="noopener"
+                    >
+                        到 Marketplace 安装 →
+                    </a>
+                    <a
+                            class="btn btn-ghost btn-lg"
+                            href="https://github.com/dong4j/skill-inspector"
+                            target="_blank"
+                            rel="noopener"
+                    >
+                        在 GitHub 查看源码
+                    </a>
+                </div>
+            </div>
+
+            <!-- Marginalia 右栏: 杂志页眉式元数据 -->
+            <aside aria-label="插件元数据">
+                <dl class="marginalia">
+                    <div>
+                        <dt>已实现规则</dt>
+                        <dd><strong>30<span class="em">+</span></strong></dd>
+                    </div>
+                    <div>
+                        <dt>分类</dt>
+                        <dd><strong>5</strong> 结构 · 质量 · 引用 · 安全 · 资源</dd>
+                    </div>
+                    <div>
+                        <dt>第三方依赖</dt>
+                        <dd><strong>0</strong> 纯 IntelliJ Platform API</dd>
+                    </div>
+                    <div>
+                        <dt>协议</dt>
+                        <dd>MIT, 永久免费</dd>
+                    </div>
+                    <div>
+                        <dt>兼容性</dt>
+                        <dd>IntelliJ IDEA <span class="mono">2024.2 — 2026.1</span></dd>
+                    </div>
+                    <div>
+                        <dt>运行环境</dt>
+                        <dd>Java 21</dd>
+                    </div>
+                </dl>
+            </aside>
         </div>
-        <div class="final-cta-side">
-          <a
-            class="btn btn-primary btn-lg"
-            href="https://plugins.jetbrains.com/plugin/31938"
-            target="_blank"
-            rel="noopener"
-          >
-            到 Marketplace 安装 →
-          </a>
-          <a
-            class="btn btn-ghost btn-lg"
-            href="https://github.com/dong4j/skill-inspector"
-            target="_blank"
-            rel="noopener"
-          >
-            查看源码
-          </a>
-        </div>
-      </div>
     </section>
 
     <!-- ================================================================
-         Footer (Colophon)
+         §2 规则清单
          ================================================================ -->
-    <footer class="site-footer">
-      <div class="container">
+    <section id="rules">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§2 · 清单</div>
+                    <div class="meta-line">所有规则, 公开在案.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        三十条规则. 五个分类. <em>一份有立场的基准.</em>
+                    </h2>
+                    <p class="section-lead">
+                        规则按 "确定性 + 风险" 分组, 和 IDEA 处理 Inspection 结果的方式一致.
+                        每条规则都有一个稳定的 ID — 可引用、可禁用、可上报 —
+                        绝不藏在不透明的 "AI 这么说" 启发式里.
+                    </p>
+                </div>
+            </header>
+
+            <div class="rules-table-wrap reveal">
+                <table class="rules-table" aria-label="精选 Inspection 规则">
+                    <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-id">Rule ID</th>
+                        <th>严重度</th>
+                        <th>说明</th>
+                        <th class="col-fix">Quick Fix</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="col-num">2.01</td>
+                        <td class="col-id"><code>frontmatter.missing</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">缺 YAML frontmatter; 跳过后续所有字段检查.</td>
+                        <td class="col-fix has-fix">ADD_FRONT_MATTER</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.02</td>
+                        <td class="col-id"><code>frontmatter.name.mismatch</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc"><code>name</code> 字段与父目录名不一致.</td>
+                        <td class="col-fix has-fix">SYNC_NAME_WITH_DIRECTORY</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.03</td>
+                        <td class="col-id"><code>frontmatter.name.invalid</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc"><code>name</code> 不符合 <code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>.</td>
+                        <td class="col-fix has-fix">CONVERT_NAME_TO_KEBAB</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.04</td>
+                        <td class="col-id"><code>frontmatter.description.missing</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">缺失或为空的 <code>description</code>; Agent 无法触发.</td>
+                        <td class="col-fix has-fix">ADD_DESCRIPTION</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.05</td>
+                        <td class="col-id"><code>description.too-generic</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">Description 是 <code>helper</code> / <code>tool</code> / <code>skill</code> /
+                            <code>assistant</code> / <code>utility</code> 之一.
+                        </td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.06</td>
+                        <td class="col-id"><code>description.missing-usage</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">没有触发短语 (<em>"use when"</em>、<em>"使用"</em> 等).</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.07</td>
+                        <td class="col-id"><code>reference.missing-file</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">相对链接指向的文件在磁盘上不存在.</td>
+                        <td class="col-fix has-fix">CREATE_MISSING_REFERENCE</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.08</td>
+                        <td class="col-id"><code>reference.case-mismatch</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">链接大小写与磁盘项不一致 (迁到 Linux 后会断).</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.09</td>
+                        <td class="col-id"><code>resource.unused-reference</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc"><code>references/</code> 下的文件从未被 <code>SKILL.md</code> 引用.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.10</td>
+                        <td class="col-id"><code>security.dangerous-command</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">正文中出现 <code>rm -rf /</code> 或管道式 <code>curl … | sh</code>.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.11</td>
+                        <td class="col-id"><code>security.secret-pattern</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">疑似 <code>api_key</code> / <code>token</code> / <code>secret</code> / <code>password</code>
+                            字段或高熵值.
+                        </td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.12</td>
+                        <td class="col-id"><code>security.sensitive-path</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">正文引导访问 <code>~/.ssh</code>、<code>.env</code>、<code>~/.aws</code>.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 5 类规则 tally -->
+            <div class="rules-tally reveal-stagger">
+                <div class="tally-item">
+                    <div class="tally-cat">结构</div>
+                    <div class="tally-num">11<em>·</em></div>
+                    <div class="tally-label">Error · frontmatter / 命名 / 长度</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">质量</div>
+                    <div class="tally-num">6<em>·</em></div>
+                    <div class="tally-label">Warning · 描述 / 正文 / 触发语</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">引用</div>
+                    <div class="tally-num">4<em>·</em></div>
+                    <div class="tally-label">Warning · 链接 / 路径 / 大小写</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">安全</div>
+                    <div class="tally-num">5<em>·</em></div>
+                    <div class="tally-label">Error · 密钥 / 危险命令</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">资源</div>
+                    <div class="tally-num">2<em>·</em></div>
+                    <div class="tally-label">Warning · 未引用 / 脚本</div>
+                </div>
+            </div>
+
+            <p class="rules-cta reveal">
+                ↳ 完整表格 (含严重度与 Quick Fix 映射) 见
+                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
+            </p>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §3 能力
+         ================================================================ -->
+    <section id="features">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§3 · 能力</div>
+                    <div class="meta-line">插件做的六件事, 一一道来.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        不是套壳的通用 Lint. <em>从头到尾, Agent-Skills aware.</em>
+                    </h2>
+                    <p class="section-lead">
+                        每项能力都对应一种真实的 <code>SKILL.md</code> 写作痛点:
+                        漏字段直接上线、相对链接断裂、悄悄混进危险脚本片段、
+                        description 模糊到 Agent 没法触发.
+                    </p>
+                </div>
+            </header>
+
+            <div class="features-list reveal-stagger">
+                <article class="feature">
+                    <div class="feature-num">01</div>
+                    <h3 class="feature-title">实时 <em>Inspection.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            注册了一个 <code>LocalInspectionTool</code>, 自动绑定到每一份
+                            <code>SKILL.md</code> 文件 (严格按文件名 gate, 其他 Markdown
+                            完全不受影响). 错误和警告实时显示在编辑器 gutter 和 Problems
+                            面板 — 体验跟 Kotlin / Java 文件完全一致.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">02</div>
+                    <h3 class="feature-title">保守的 <em>Quick Fix.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            添加缺失的 frontmatter、把 <code>name</code> 同步到父目录、
+                            转成 kebab-case、为缺失的引用创建占位文件 — 一次
+                            <kbd>Alt</kbd>+<kbd>Enter</kbd> 即可. 插件永远不会自动改写你的正文.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">03</div>
+                    <h3 class="feature-title">全项目 <em>扫描.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            右键 → <em>Validate&nbsp;Skill</em>. 后台任务通过
+                            <code>FilenameIndex</code> 扫描所有 <code>SKILL.md</code>,
+                            汇总 Error / Warning 总数并跳转到第一个出错文件. 也可以在 CI
+                            中以 headless inspection 形式跑同一套规则.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">04</div>
+                    <h3 class="feature-title">默认 <em>规范优先.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            所有规则锚定在
+                            <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;官方规范</a>,
+                            不锚定任何单一 Agent 的私有扩展. Agent 特定的差异在 V2 以
+                            兼容性提示形式补充, 永远不作为默认错误. 你的 skill 保持可移植.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">05</div>
+                    <h3 class="feature-title">状态栏 <em>开关.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            状态栏自带一个 widget, 一键开关整个 Inspection —
+                            不用钻进 <em>Settings → Inspections</em>. 细粒度调节走
+                            <em>Tools → Skill Inspector</em>.
+                        </p>
+                        <a class="read-more" href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
+                            规则手册 →
+                        </a>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">06</div>
+                    <h3 class="feature-title">零 <em>依赖.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            纯 IntelliJ Platform API — 不引入任何第三方插件库, 无 telemetry,
+                            无远程调用. 内网 / 涉密环境完全可用; 想验证的话直接
+                            <code>jar -tf</code> 看插件 zip 内含什么.
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §4 示例 (Code diff gallery)
+         ================================================================ -->
+    <section id="diffs">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§4 · 示例</div>
+                    <div class="meta-line">修复前 · 修复后, 三个真实案例.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        修好后的 <code class="mono">SKILL.md</code> <em>到底长什么样.</em>
+                    </h2>
+                    <p class="section-lead">
+                        下面三对最小示例来自上面的规则清单. 每一对左边是触发规则的输入,
+                        右边是按一次 <kbd>Alt</kbd>+<kbd>Enter</kbd> 之后的样子.
+                    </p>
+                </div>
+            </header>
+
+            <div class="diff-grid reveal-stagger">
+                <!-- Diff 1 -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">frontmatter.name.mismatch</div>
+                        <h3 class="diff-h"><em>name</em> 必须等于目录名.</h3>
+                        <p class="diff-cap-body">
+                            Agent 通过目录名来发现 skill. 如果 <code>name</code> 漂移了
+                            (snake_case、大小写、拼错), 这个 skill 就再也无法被寻址.
+                            <span class="fix">Quick Fix · SYNC_NAME_WITH_DIRECTORY</span>
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— 修复前</span><span>code-reviewer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vr">code_reviewer</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ 修复后</span><span>code-reviewer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vg">code-reviewer</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Diff 2 -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">frontmatter.description.missing</div>
+                        <h3 class="diff-h">没有 <em>description,</em> Agent 没法触发.</h3>
+                        <p class="diff-cap-body">
+                            <code>description</code> 是 Agent 发现 loader 读取的第一道字段,
+                            在加载正文之前. 留空 = 在每个 prompt 上对每个 Agent 都不可见.
+                            <span class="fix">Quick Fix · ADD_DESCRIPTION</span>
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— 修复前</span><span>commit-helper/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vr"></span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ 修复后</span><span>commit-helper/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vg">Use when generating a commit message from staged changes.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Diff 3 -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">security.dangerous-command</div>
+                        <h3 class="diff-h">有些事就不能 <em>自动修.</em></h3>
+                        <p class="diff-cap-body">
+                            安全规则只定位上报, 绝不自动改写. 管道式 <code>curl … | sh</code>
+                            会被精准定位到具体 text range — 该 pin hash、该换源、还是该
+                            接受风险加 <code>noinspection</code>, 由你决定.
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— 被标记</span><span>installer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span>
+                                </div>
+                                <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">10</span><span class="marker"></span><span class="code"><span class="vr">    curl https://x.example/install.sh | sh</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ 建议改写</span><span>installer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span>
+                                </div>
+                                <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">10</span><span class="marker"></span><span class="code"><span class="vg">    curl -fsSL https://x.example/install.sh -o /tmp/install.sh</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">11</span><span class="marker"></span><span class="code"><span class="vg">    sha256sum -c install.sh.sha256 &amp;&amp; sh /tmp/install.sh</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §5 适用人群
+         ================================================================ -->
+    <section id="personas">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§5 · 受众</div>
+                    <div class="meta-line">四个场景, 不编造引用.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        插件围绕 <em>四类真实受众</em> 设计.
+                    </h2>
+                    <p class="section-lead">
+                        在项目积累更多真实用户之前, 这是 Skill Inspector 设计时优先服务的
+                        场景. 我们拒绝用 stock 头像编造客户引言 — 等到真实用户开口,
+                        下面的引述就会逐字替换.
+                    </p>
+                </div>
+            </header>
+
+            <div class="personas reveal-stagger">
+                <article class="persona">
+                    <p class="persona-quote">
+                        我希望 <code>SKILL.md</code> 在 commit <em>之前</em>就大声报错.
+                    </p>
+                    <div class="persona-cite">Skill 作者</div>
+                    <p class="persona-body">
+                        在 IDEA 里打开文件. 缺必填字段、目录名漂移、相对链接断裂 —
+                        都会在你 push 之前出现在 gutter 上. 按
+                        <kbd>Alt</kbd>+<kbd>Enter</kbd> 应用确定性修复; 正文仍然归你.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        团队为多个 Agent 写 skill, 我要 <em>一致的质量门槛.</em>
+                    </p>
+                    <div class="persona-cite">团队负责人</div>
+                    <p class="persona-body">
+                        所有开发者的 IDE 看到的 Inspection 结果完全一致 — 因为规则装在插件里,
+                        不在个人 config 里. CI 也可以在每个 PR 上 headless 跑同一套
+                        <em>Validate Skill</em>, 不合规的 skill 不会进 <code>main</code>.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        我发布 skill 包, 不希望 reviewer 把时间花在 <em>机械错误</em> 上.
+                    </p>
+                    <div class="persona-cite">开源维护者</div>
+                    <p class="persona-body">
+                        结构 / 质量 / 引用类规则自动 catch 那些无聊的事情 —
+                        name 不匹配、死链、过宽的描述、
+                        <code>references/</code> 下没人引用的文件. Reviewer
+                        可以专心看 <strong>内容</strong>, 而不是格式.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        我要知道 skill 里有没有 <code>curl … | sh</code>, 有没有 <em>泄密.</em>
+                    </p>
+                    <div class="persona-cite">安全敏感的企业</div>
+                    <p class="persona-body">
+                        安全规则会标记危险命令、疑似 API key、高熵字符串、
+                        敏感路径 (<code>~/.ssh</code>、<code>.env</code>) 以及
+                        prompt-injection 文案. V1 只定位上报, 绝不自动改写 —
+                        决定权永远在人手上.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §6 常见问题
+         ================================================================ -->
+    <section id="faq">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§6 · 问答</div>
+                    <div class="meta-line">有出处的诚实回答.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        安装前的 <em>八个问题.</em>
+                    </h2>
+                </div>
+            </header>
+
+            <div class="faq-list reveal-stagger">
+                <article class="faq-item">
+                    <div class="faq-num">§6.1</div>
+                    <details class="faq-content">
+                        <summary>支持哪些 IDE 版本?</summary>
+                        <div class="faq-body">
+                            IntelliJ IDEA Community / Ultimate <strong>2024.2 → 2026.1</strong>
+                            是官方基线 — 插件声明
+                            <code>sinceBuild = 242.2</code>、<code>untilBuild = 261.*</code>.
+                            CI 在 IC/IU 2024.2、2024.3、2025.1、2025.2、2025.3 上完成构建与验证;
+                            2026.1 在声明的兼容性范围内. 同平台的其他 JetBrains IDE
+                            (PyCharm / GoLand / WebStorm 等) 通常也能在这个 build range 内工作,
+                            但只有 IDEA 经过 CI 测试.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.2</div>
+                    <details class="faq-content">
+                        <summary>目前实现了哪些规则? 完整列表在哪?</summary>
+                        <div class="faq-body">
+                            共 5 个分类 — <strong>结构 Structural</strong> (11 条)、
+                            <strong>质量 Quality</strong> (6 条)、
+                            <strong>引用 Reference</strong> (4 条)、
+                            <strong>安全 Security</strong> (5 条)、
+                            <strong>资源 Resource</strong> (2 条).
+                            每条都有稳定的 rule ID, 例如 <code>frontmatter.name.mismatch</code>
+                            或 <code>security.dangerous-command</code>. 完整表格见
+                            <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.3</div>
+                    <details class="faq-content">
+                        <summary>有 telemetry 吗?</summary>
+                        <div class="faq-body">
+                            没有. 无埋点、无 analytics、无远程调用. 插件只读取项目里的
+                            <code>SKILL.md</code>, 所有 Inspection 都在本地完成,
+                            适用于完全离线 / 涉密环境.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.4</div>
+                    <details class="faq-content">
+                        <summary>"Quick Fix" 具体会自动改什么?</summary>
+                        <div class="faq-body">
+                            只做确定性、保守的修复:
+                            <strong>添加缺失的 frontmatter</strong>、
+                            <strong>添加 <code>name</code> 字段</strong>、
+                            <strong>把 <code>name</code> 同步到父目录</strong>、
+                            <strong>把 <code>name</code> 转为 kebab-case</strong>、
+                            <strong>添加 <code>description</code> 占位</strong>、
+                            <strong>为缺失引用创建空文件 (含父目录)</strong>.
+                            插件永远不会自动改写你的正文.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.5</div>
+                    <details class="faq-content">
+                        <summary>它和普通 Markdown lint 有什么区别?</summary>
+                        <div class="faq-body">
+                            Skill Inspector 是 <em>Agent-Skills aware</em> 的.
+                            它把 YAML frontmatter 解析成真正的
+                            <code>SkillFrontMatter</code> 领域 record, 知道
+                            <code>name</code> 必须等于父目录名, 校验 skill 目录内的相对链接
+                            (含跨平台大小写检查), 还会扫描安全风险.
+                            这些通用 Markdown lint 工具都做不到.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.6</div>
+                    <details class="faq-content">
+                        <summary>只对文件名严格等于 <code>SKILL.md</code> 的文件生效?</summary>
+                        <div class="faq-body">
+                            是的. Inspection 第一道关就是
+                            <code>PsiFile.getName().equals("SKILL.md")</code>.
+                            这保证 <code>readme.md</code>、<code>notes.md</code>
+                            等其他 Markdown 文件完全不受影响 —
+                            不打开 skill 文件就感受不到这个插件.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.7</div>
+                    <details class="faq-content">
+                        <summary>能临时关掉所有 Inspection 吗?</summary>
+                        <div class="faq-body">
+                            可以. 状态栏 widget 一键开关, 不用去
+                            <em>Settings → Inspections</em> 里找. 需要细调时, 走
+                            <em>Tools → Skill Inspector</em> 设置页.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.8</div>
+                    <details class="faq-content">
+                        <summary>开源吗? 什么协议?</summary>
+                        <div class="faq-body">
+                            开源, <strong>MIT</strong> 协议, 源码在
+                            <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">GitHub</a>.
+                            欢迎 issue / PR / 新规则贡献, 贡献指南见
+                            <a href="https://github.com/dong4j/skill-inspector/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.
+                        </div>
+                    </details>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ================================================================
+     §7 Final CTA
+     ================================================================ -->
+<section class="final-cta" aria-label="获取插件">
+    <div class="container final-cta-inner">
+        <div>
+            <h2 class="final-cta-title">
+                别再发布有问题的 <em>SKILL.md</em> 了.
+            </h2>
+            <p class="final-cta-sub">
+                到 JetBrains Marketplace 安装, 打开任意包含
+                <code class="mono">SKILL.md</code> 的项目, 检查结果会在同一秒出现.
+                全部上手成本就是这一步.
+            </p>
+            <div class="final-cta-meta">
+                <span>MIT 协议</span>
+                <span>Java 21</span>
+                <span>IntelliJ 2024.2 → 2026.1</span>
+                <span>v2026.1.1000</span>
+            </div>
+        </div>
+        <div class="final-cta-side">
+            <a
+                    class="btn btn-primary btn-lg"
+                    href="https://plugins.jetbrains.com/plugin/31938"
+                    target="_blank"
+                    rel="noopener"
+            >
+                到 Marketplace 安装 →
+            </a>
+            <a
+                    class="btn btn-ghost btn-lg"
+                    href="https://github.com/dong4j/skill-inspector"
+                    target="_blank"
+                    rel="noopener"
+            >
+                查看源码
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ================================================================
+     Footer (Colophon)
+     ================================================================ -->
+<footer class="site-footer">
+    <div class="container">
         <div class="footer-grid">
-          <div class="footer-brand">
-            <a href="#top" class="brand">
+            <div class="footer-brand">
+                <a href="#top" class="brand">
               <span class="brand-mark" aria-hidden="true">
                 <img src="../assets/plugin-icon.svg" alt="">
               </span>
-              <span class="brand-name">
+                    <span class="brand-name">
                 <span>Skill Inspector</span>
               </span>
-            </a>
-            <p>
-              一个 JetBrains IDE 插件, 基于 Agent Skills 官方规范 Lint
-              <code class="mono">SKILL.md</code> — 实时检查、Quick Fix、零第三方依赖.
-            </p>
-          </div>
+                </a>
+                <p>
+                    一个 JetBrains IDE 插件, 基于 Agent Skills 官方规范 Lint
+                    <code class="mono">SKILL.md</code> — 实时检查、Quick Fix、零第三方依赖.
+                </p>
+            </div>
 
-          <div class="footer-col">
-            <h4>产品</h4>
-            <ul>
-              <li><a href="#rules">规则</a></li>
-              <li><a href="#features">功能</a></li>
-              <li><a href="#diffs">示例</a></li>
-              <li><a href="#faq">常见问题</a></li>
-              <li>
-                <a
-                  href="https://plugins.jetbrains.com/plugin/31938"
-                  target="_blank"
-                  rel="noopener"
-                >Marketplace</a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>产品</h4>
+                <ul>
+                    <li><a href="#rules">规则</a></li>
+                    <li><a href="#features">功能</a></li>
+                    <li><a href="#diffs">示例</a></li>
+                    <li><a href="#faq">常见问题</a></li>
+                    <li>
+                        <a
+                                href="https://plugins.jetbrains.com/plugin/31938"
+                                target="_blank"
+                                rel="noopener"
+                        >Marketplace</a>
+                    </li>
+                </ul>
+            </div>
 
-          <div class="footer-col">
-            <h4>资源</h4>
-            <ul>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
-                  规则手册
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/design.md" target="_blank" rel="noopener">
-                  设计文档
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/roadmap.md" target="_blank" rel="noopener">
-                  路线图
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/issues" target="_blank" rel="noopener">
-                  提交 issue
-                </a>
-              </li>
-              <li>
-                <a href="https://agentskills.io/specification" target="_blank" rel="noopener">
-                  Agent Skills 规范
-                </a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>资源</h4>
+                <ul>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">
+                            GitHub
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
+                            规则手册
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/design.md" target="_blank" rel="noopener">
+                            设计文档
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/roadmap.md" target="_blank" rel="noopener">
+                            路线图
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/issues" target="_blank" rel="noopener">
+                            提交 issue
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://agentskills.io/specification" target="_blank" rel="noopener">
+                            Agent Skills 规范
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-          <div class="footer-col">
-            <h4>作者</h4>
-            <ul>
-              <li><a href="https://github.com/dong4j" target="_blank" rel="noopener">@dong4j</a></li>
-              <li>
-                <a
-                  href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e"
-                  target="_blank"
-                  rel="noopener"
-                >其他插件</a>
-              </li>
-              <li>
-                <a href="mailto:dong4j@gmail.com">邮箱</a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>作者</h4>
+                <ul>
+                    <li><a href="https://github.com/dong4j" target="_blank" rel="noopener">@dong4j</a></li>
+                    <li>
+                        <a
+                                href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e"
+                                target="_blank"
+                                rel="noopener"
+                        >其他插件</a>
+                    </li>
+                    <li>
+                        <a href="mailto:dong4j@gmail.com">邮箱</a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <hr class="hairline">
 
         <div class="footer-bottom">
-          <span>© 2026 dong4j · MIT License</span>
-          <span class="colophon">
-            正文使用系统字体; 代码 <em>JetBrains&nbsp;Mono</em>.
-          </span>
+            <span>© 2026 dong4j · MIT License</span>
+            <span>为编写 Agent Skill 的 JetBrains 开发者而做.</span>
         </div>
-      </div>
-    </footer>
+    </div>
+</footer>
 
-    <script src="../assets/main.js" defer></script>
-  </body>
+<script src="../assets/main.js" defer></script>
+</body>
 </html>

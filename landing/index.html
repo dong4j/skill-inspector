@@ -25,27 +25,27 @@
     11. Footer                    -> Colophon 风脚注 (字体说明 + 协议)
 -->
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#F7F4ED">
 
     <title>Skill Inspector — A linter for SKILL.md, inside JetBrains IDE | dong4j</title>
     <meta
-      name="description"
-      content="A JetBrains IDE plugin that lints SKILL.md against the official Agent Skills specification. Real-time inspections, quick fixes, 30+ rules across structural, quality, reference, security and resource categories — with zero external dependencies."
+            name="description"
+            content="A JetBrains IDE plugin that lints SKILL.md against the official Agent Skills specification. Real-time inspections, quick fixes, 30+ rules across structural, quality, reference, security and resource categories — with zero external dependencies."
     >
     <meta
-      name="keywords"
-      content="Skill Inspector, Agent Skills, SKILL.md, JetBrains plugin, IntelliJ IDEA plugin, markdown linter, frontmatter validation, agent skills specification"
+            name="keywords"
+            content="Skill Inspector, Agent Skills, SKILL.md, JetBrains plugin, IntelliJ IDEA plugin, markdown linter, frontmatter validation, agent skills specification"
     >
     <meta name="author" content="dong4j">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Skill Inspector — A linter for SKILL.md">
     <meta
-      property="og:description"
-      content="Real-time inspection for Agent Skills (SKILL.md) inside JetBrains IDE — built on the official specification, with 30+ rules and quick fixes."
+            property="og:description"
+            content="Real-time inspection for Agent Skills (SKILL.md) inside JetBrains IDE — built on the official specification, with 30+ rules and quick fixes."
     >
     <meta property="og:image" content="./assets/plugin-icon.svg">
 
@@ -69,902 +69,952 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
     >
 
     <link rel="stylesheet" href="./assets/styles.css">
-  </head>
+</head>
 
-  <body>
-    <!-- ================================================================
-         Element 2: Header (sticky, minimal)
-         ================================================================ -->
-    <header class="site-header" data-scrolled="false">
-      <div class="container nav">
+<body>
+<!-- ================================================================
+     Element 2: Header (sticky, minimal)
+     ================================================================ -->
+<header class="site-header" data-scrolled="false">
+    <div class="container nav">
         <a href="#top" class="brand" aria-label="Skill Inspector home">
           <span class="brand-mark" aria-hidden="true">
             <img src="./assets/plugin-icon.svg" alt="">
           </span>
-          <span class="brand-name">
+            <span class="brand-name">
             <span>Skill Inspector</span>
             <span class="brand-version">v2026.1</span>
           </span>
         </a>
 
         <nav aria-label="Primary">
-          <ul class="nav-links">
-            <li><a href="#rules">Rules</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#diffs">Examples</a></li>
-            <li><a href="#faq">FAQ</a></li>
-          </ul>
+            <ul class="nav-links">
+                <li><a href="#rules">Rules</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#diffs">Examples</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
         </nav>
 
         <div class="nav-actions">
-          <div class="lang-switch" role="group" aria-label="Language">
-            <a href="./" aria-current="true">EN</a>
-            <a href="./zh/">中文</a>
-          </div>
-          <a
-            class="nav-cta"
-            href="https://plugins.jetbrains.com/plugin/31938"
-            target="_blank"
-            rel="noopener"
-          >
-            Install
-          </a>
+            <div class="lang-switch" role="group" aria-label="Language">
+                <a href="./" aria-current="true">EN</a>
+                <a href="./zh/">中文</a>
+            </div>
+            <a
+                    class="nav-cta"
+                    href="https://plugins.jetbrains.com/plugin/31938"
+                    target="_blank"
+                    rel="noopener"
+            >
+                Install
+            </a>
         </div>
-      </div>
-    </header>
+    </div>
+</header>
 
-    <main id="top">
-      <!-- ================================================================
-           §1 Hero — Editorial 大标 + marginalia 右栏
-           Element 3 (title) + 4 (CTA) + 5 (social proof in marginalia)
-           ================================================================ -->
-      <section class="hero">
-        <div class="container hero-grid">
-          <div>
-            <div class="hero-eyebrow">
-              <span class="section-num">§1 · Introduction</span>
-            </div>
-
-            <h1 class="hero-title">
-              A linter
-              <em>for <span class="underdash">SKILL.md</span>.</em>
-              Right inside
-              <em>the IDE.</em>
-            </h1>
-
-            <p class="hero-lead">
-              Skill Inspector is a JetBrains IDE plugin that treats every
-              <code>SKILL.md</code> as a first-class linted document —
-              real-time inspections, quick fixes, and a Problems-panel
-              integration anchored to the official
-              <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;specification</a>,
-              with zero external dependencies.
-            </p>
-
-            <div class="hero-cta">
-              <a
-                class="btn btn-primary btn-lg"
-                href="https://plugins.jetbrains.com/plugin/31938"
-                target="_blank"
-                rel="noopener"
-              >
-                Install on Marketplace →
-              </a>
-              <a
-                class="btn btn-ghost btn-lg"
-                href="https://github.com/dong4j/skill-inspector"
-                target="_blank"
-                rel="noopener"
-              >
-                Source on GitHub
-              </a>
-            </div>
-          </div>
-
-          <!-- Marginalia 右栏: 杂志页眉式元数据栏, 同时承担 social proof -->
-          <aside aria-label="Plugin metadata">
-            <dl class="marginalia">
-              <div>
-                <dt>Rules shipped</dt>
-                <dd><strong>30<span class="em">+</span></strong></dd>
-              </div>
-              <div>
-                <dt>Categories</dt>
-                <dd><strong>5</strong> Structural · Quality · Reference · Security · Resource</dd>
-              </div>
-              <div>
-                <dt>External deps</dt>
-                <dd><strong>0</strong> Pure IntelliJ Platform API</dd>
-              </div>
-              <div>
-                <dt>License</dt>
-                <dd>MIT, free forever</dd>
-              </div>
-              <div>
-                <dt>Compatibility</dt>
-                <dd>IntelliJ IDEA <span class="mono">2024.2 — 2026.1</span></dd>
-              </div>
-              <div>
-                <dt>Runtime</dt>
-                <dd>Java 21</dd>
-              </div>
-            </dl>
-          </aside>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §2 Rules Manifest — 真实表格 (Lint 工具最有说服力的展示)
-           Element 7 (features) 的一部分: 把规则集摊在台面上, 像 spec 一样
-           ================================================================ -->
-      <section id="rules">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§2 · The Manifest</div>
-              <div class="meta-line">Every rule, on the record.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                Thirty rules. Five categories. <em>One opinionated baseline.</em>
-              </h2>
-              <p class="section-lead">
-                Rules are grouped by determinism and risk, the same way IDEA
-                groups inspection results. Every rule has a stable ID you can
-                cite, suppress, or report against — no opaque "AI says so"
-                heuristics.
-              </p>
-            </div>
-          </header>
-
-          <div class="rules-table-wrap reveal">
-            <table class="rules-table" aria-label="Selected inspection rules">
-              <thead>
-                <tr>
-                  <th class="col-num">#</th>
-                  <th class="col-id">Rule ID</th>
-                  <th>Severity</th>
-                  <th>Description</th>
-                  <th class="col-fix">Quick Fix</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="col-num">2.01</td>
-                  <td class="col-id"><code>frontmatter.missing</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">No YAML frontmatter; all subsequent field checks are skipped.</td>
-                  <td class="col-fix has-fix">ADD_FRONT_MATTER</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.02</td>
-                  <td class="col-id"><code>frontmatter.name.mismatch</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc"><code>name</code> field does not equal the parent directory name.</td>
-                  <td class="col-fix has-fix">SYNC_NAME_WITH_DIRECTORY</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.03</td>
-                  <td class="col-id"><code>frontmatter.name.invalid</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc"><code>name</code> does not match <code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>.</td>
-                  <td class="col-fix has-fix">CONVERT_NAME_TO_KEBAB</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.04</td>
-                  <td class="col-id"><code>frontmatter.description.missing</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">Missing or empty <code>description</code>; agents cannot trigger.</td>
-                  <td class="col-fix has-fix">ADD_DESCRIPTION</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.05</td>
-                  <td class="col-id"><code>description.too-generic</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">Description is one of <code>helper</code>, <code>tool</code>, <code>skill</code>, <code>assistant</code>, <code>utility</code>.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.06</td>
-                  <td class="col-id"><code>description.missing-usage</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">No trigger phrase (<em>"use when"</em>, <em>"when to use"</em>, etc.).</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.07</td>
-                  <td class="col-id"><code>reference.missing-file</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">Relative link target does not exist on disk.</td>
-                  <td class="col-fix has-fix">CREATE_MISSING_REFERENCE</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.08</td>
-                  <td class="col-id"><code>reference.case-mismatch</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">Link case differs from on-disk entry (will break on Linux).</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.09</td>
-                  <td class="col-id"><code>resource.unused-reference</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">File under <code>references/</code> is never linked from <code>SKILL.md</code>.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.10</td>
-                  <td class="col-id"><code>security.dangerous-command</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">Detects <code>rm -rf /</code> or piped <code>curl … | sh</code> in body.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.11</td>
-                  <td class="col-id"><code>security.secret-pattern</code></td>
-                  <td><span class="sev sev-error">Error</span></td>
-                  <td class="col-desc">Suspected <code>api_key</code>, <code>token</code>, <code>secret</code>, <code>password</code> or high-entropy value.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-                <tr>
-                  <td class="col-num">2.12</td>
-                  <td class="col-id"><code>security.sensitive-path</code></td>
-                  <td><span class="sev sev-warning">Warn</span></td>
-                  <td class="col-desc">Body steers towards <code>~/.ssh</code>, <code>.env</code>, <code>~/.aws</code>.</td>
-                  <td class="col-fix">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- 5 类规则统计 tally — 表格底部, 像 spec 的 "Total" 行 -->
-          <div class="rules-tally reveal-stagger">
-            <div class="tally-item">
-              <div class="tally-cat">Structural</div>
-              <div class="tally-num">11<em>·</em></div>
-              <div class="tally-label">Error · frontmatter, naming, length</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">Quality</div>
-              <div class="tally-num">6<em>·</em></div>
-              <div class="tally-label">Warning · description, body, triggers</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">Reference</div>
-              <div class="tally-num">4<em>·</em></div>
-              <div class="tally-label">Warning · links, paths, case</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">Security</div>
-              <div class="tally-num">5<em>·</em></div>
-              <div class="tally-label">Error · secrets, dangerous cmds</div>
-            </div>
-            <div class="tally-item">
-              <div class="tally-cat">Resource</div>
-              <div class="tally-num">2<em>·</em></div>
-              <div class="tally-label">Warning · unused refs, scripts</div>
-            </div>
-          </div>
-
-          <p class="rules-cta reveal">
-            ↳ The complete table, with severities and quick-fix mappings, lives in
-            <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
-          </p>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §3 Features — 编号大数字 + 段落 (替代 bento 卡片网格)
-           Element 7 的另一面: 不是规则集而是 "为什么用它"
-           ================================================================ -->
-      <section id="features">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§3 · Capabilities</div>
-              <div class="meta-line">Six things the plugin does, plainly.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                Not a wrapper around a generic linter. <em>Agent-Skills-aware, end to end.</em>
-              </h2>
-              <p class="section-lead">
-                Every capability removes a real friction in writing
-                <code>SKILL.md</code>: missing fields shipped to production,
-                broken relative links, dangerous shell snippets, descriptions
-                Agents cannot trigger on.
-              </p>
-            </div>
-          </header>
-
-          <div class="features-list reveal-stagger">
-            <article class="feature">
-              <div class="feature-num">01</div>
-              <h3 class="feature-title">Real-time <em>inspection.</em></h3>
-              <div class="feature-body">
-                <p>
-                  A <code>LocalInspectionTool</code> attaches to every
-                  <code>SKILL.md</code> file (gated strictly on file name, so other
-                  Markdown stays untouched). Errors and warnings appear live in the
-                  editor gutter and Problems panel — exactly like a Kotlin or Java
-                  file would.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">02</div>
-              <h3 class="feature-title">Conservative <em>quick fixes.</em></h3>
-              <div class="feature-body">
-                <p>
-                  Add missing frontmatter, sync <code>name</code> with the parent
-                  directory, convert to kebab-case, scaffold a missing reference —
-                  one <kbd>Alt</kbd>+<kbd>Enter</kbd> away. The plugin never
-                  rewrites your prose.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">03</div>
-              <h3 class="feature-title">Project-wide <em>scan.</em></h3>
-              <div class="feature-body">
-                <p>
-                  Right-click → <em>Validate&nbsp;Skill</em>. A background task
-                  <code>FilenameIndex</code>-scans every <code>SKILL.md</code>,
-                  aggregates a clean Error/Warning summary, and jumps to the first
-                  failing file. Works in CI via headless inspection too.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">04</div>
-              <h3 class="feature-title">Specification-first <em>by default.</em></h3>
-              <div class="feature-body">
-                <p>
-                  Rules anchor on the official
-                  <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;specification</a>,
-                  not any single Agent's private extension. Agent-specific quirks
-                  become advisory profiles in V2 — never default errors. Your
-                  skills stay portable.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">05</div>
-              <h3 class="feature-title">Status-bar <em>switch.</em></h3>
-              <div class="feature-body">
-                <p>
-                  A status-bar widget toggles the whole inspection on or off with a
-                  single click — no hunting through <em>Settings → Inspections</em>.
-                  Fine-grained tuning lives at <em>Tools → Skill Inspector</em>.
-                </p>
-                <a class="read-more" href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
-                  Rules reference →
-                </a>
-              </div>
-            </article>
-
-            <article class="feature">
-              <div class="feature-num">06</div>
-              <h3 class="feature-title">Zero <em>dependencies.</em></h3>
-              <div class="feature-body">
-                <p>
-                  Pure IntelliJ Platform API — no third-party plugin kit, no
-                  telemetry, no remote calls. Safe in air-gapped enterprise
-                  environments; <code>jar -tf</code> the bundled plugin if you want
-                  to verify.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §4 Code Diff Gallery — 真实 before/after, 取代 IDE 截图 mockup
-           Element 6 (media) 的重新解读: 对 Lint 工具来说, 修复前后对比
-           是最有说服力的视觉证明
-           ================================================================ -->
-      <section id="diffs">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§4 · Examples</div>
-              <div class="meta-line">Before · after, three real cases.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                What a fixed <code class="mono">SKILL.md</code> <em>actually looks like.</em>
-              </h2>
-              <p class="section-lead">
-                Three minimal examples drawn from the rule manifest above. Each
-                pair shows the input that triggers the inspection, and the file
-                after a single <kbd>Alt</kbd>+<kbd>Enter</kbd>.
-              </p>
-            </div>
-          </header>
-
-          <div class="diff-grid reveal-stagger">
-            <!-- Diff 1: name mismatch + kebab fix -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">frontmatter.name.mismatch</div>
-                <h3 class="diff-h">The <em>name</em> must match the directory.</h3>
-                <p class="diff-cap-body">
-                  Agents discover a skill by directory name. If <code>name</code>
-                  drifts (snake_case, capitalisation, typo), the skill stops
-                  being addressable.
-                  <span class="fix">Quick Fix · SYNC_NAME_WITH_DIRECTORY</span>
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— Before</span><span>code-reviewer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line del"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vr">code_reviewer</span></span></div>
-                    <div class="diff-line"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ After</span><span>code-reviewer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line add"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vg">code-reviewer</span></span></div>
-                    <div class="diff-line"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Diff 2: missing description + ADD_DESCRIPTION -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">frontmatter.description.missing</div>
-                <h3 class="diff-h">Without a <em>description,</em> no Agent can trigger.</h3>
-                <p class="diff-cap-body">
-                  The <code>description</code> field is what the discovery loader
-                  reads before the body. Empty means the skill is invisible to
-                  every Agent on every prompt.
-                  <span class="fix">Quick Fix · ADD_DESCRIPTION</span>
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— Before</span><span>commit-helper/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span></div>
-                    <div class="diff-line del"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vr"></span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ After</span><span>commit-helper/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                    <div class="diff-line"><span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span></div>
-                    <div class="diff-line add"><span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vg">Use when generating a commit message from staged changes.</span></span></div>
-                    <div class="diff-line"><span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Diff 3: security.dangerous-command (no auto-fix, just flagged) -->
-            <article class="diff-item">
-              <div class="diff-caption">
-                <div class="diff-rule">security.dangerous-command</div>
-                <h3 class="diff-h">Some things must not <em>auto-fix.</em></h3>
-                <p class="diff-cap-body">
-                  Security rules locate and flag, never rewrite. A piped
-                  <code>curl … | sh</code> is reported with a precise text range so
-                  you can decide: pin a hash, swap the source, or accept the risk
-                  with a <code>noinspection</code> comment.
-                </p>
-              </div>
-              <div class="diff-blocks">
-                <div class="diff-block before">
-                  <div class="diff-block-head"><span class="tag">— Reported</span><span>installer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span></div>
-                    <div class="diff-line"><span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span></div>
-                    <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span></div>
-                    <div class="diff-line del"><span class="ln">10</span><span class="marker"></span><span class="code"><span class="vr">    curl https://x.example/install.sh | sh</span></span></div>
-                  </div>
-                </div>
-                <div class="diff-block after">
-                  <div class="diff-block-head"><span class="tag">+ Suggested</span><span>installer/SKILL.md</span></div>
-                  <div class="diff-block-body">
-                    <div class="diff-line"><span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span></div>
-                    <div class="diff-line"><span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span></div>
-                    <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span></div>
-                    <div class="diff-line add"><span class="ln">10</span><span class="marker"></span><span class="code"><span class="vg">    curl -fsSL https://x.example/install.sh -o /tmp/install.sh</span></span></div>
-                    <div class="diff-line add"><span class="ln">11</span><span class="marker"></span><span class="code"><span class="vg">    sha256sum -c install.sh.sha256 &amp;&amp; sh /tmp/install.sh</span></span></div>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §5 Who it's for — blockquote 风, 不造假 testimonials
-           Element 8: 用 editorial 引述代替假人名假头像
-           ================================================================ -->
-      <section id="personas">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§5 · Audience</div>
-              <div class="meta-line">Four scenarios, no fabricated quotes.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                The plugin was designed around <em>four real audiences.</em>
-              </h2>
-              <p class="section-lead">
-                Until the project has more shipped users, these are the scenarios
-                Skill Inspector was built to serve. We refuse to invent quotes
-                with stock photos — when real users speak up, the words below
-                will be replaced verbatim.
-              </p>
-            </div>
-          </header>
-
-          <div class="personas reveal-stagger">
-            <article class="persona">
-              <p class="persona-quote">
-                I want my <code>SKILL.md</code> to fail loudly <em>before</em> I commit it.
-              </p>
-              <div class="persona-cite">Skill author</div>
-              <p class="persona-body">
-                Open the file in IDEA. Missing required fields, directory-name
-                drift, or a dead relative link — all surface in the gutter before
-                you push. <kbd>Alt</kbd>+<kbd>Enter</kbd> applies the deterministic
-                fix; the prose stays yours.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                My team writes skills for several agents. I need <em>one quality bar.</em>
-              </p>
-              <div class="persona-cite">Team lead</div>
-              <p class="persona-body">
-                Every developer's IDE sees the same inspection results because
-                the rules live in the plugin, not in personal configs. CI can run
-                the same <em>Validate Skill</em> sweep headlessly on every PR —
-                non-spec-compliant skills never reach <code>main</code>.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                I publish skill bundles. Reviewers shouldn't waste time on <em>mechanical mistakes.</em>
-              </p>
-              <div class="persona-cite">OSS maintainer</div>
-              <p class="persona-body">
-                Structural, quality and reference rules catch the boring stuff
-                automatically — name mismatches, dead links, descriptions too
-                vague to trigger, <code>references/</code> files no one cites.
-                Reviewers get to focus on <strong>content</strong>, not format.
-              </p>
-            </article>
-
-            <article class="persona">
-              <p class="persona-quote">
-                I need to know if a skill ships <code>curl … | sh</code> or <em>leaks secrets.</em>
-              </p>
-              <div class="persona-cite">Security-aware enterprise</div>
-              <p class="persona-body">
-                Security rules flag dangerous commands, suspected API keys,
-                high-entropy strings, sensitive paths (<code>~/.ssh</code>,
-                <code>.env</code>) and prompt-injection phrases. V1 locates and
-                reports only — never auto-rewrites — so review stays human-led.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================================================================
-           §6 FAQ — spec 风 §6.1 / §6.2 编号
-           Element 9
-           ================================================================ -->
-      <section id="faq">
-        <div class="container">
-          <header class="section-head reveal">
-            <div class="meta">
-              <div class="section-num">§6 · Q&amp;A</div>
-              <div class="meta-line">Honest answers, cited where possible.</div>
-            </div>
-            <div>
-              <h2 class="section-title">
-                Eight questions <em>before</em> you install.
-              </h2>
-            </div>
-          </header>
-
-          <div class="faq-list reveal-stagger">
-            <article class="faq-item">
-              <div class="faq-num">§6.1</div>
-              <details class="faq-content">
-                <summary>Which IDEs are supported?</summary>
-                <div class="faq-body">
-                  IntelliJ IDEA Community / Ultimate <strong>2024.2 → 2026.1</strong>
-                  are the official baseline — the plugin declares
-                  <code>sinceBuild = 242.2</code> and <code>untilBuild = 261.*</code>.
-                  CI builds &amp; verifies against IC/IU 2024.2, 2024.3, 2025.1,
-                  2025.2 and 2025.3; 2026.1 is covered by the declared
-                  compatibility range. Other JetBrains IDEs on the same platform
-                  (PyCharm, GoLand, WebStorm, …) usually work within that build
-                  range, but only IDEA is tested by CI.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.2</div>
-              <details class="faq-content">
-                <summary>What rules ship today? Where is the full list?</summary>
-                <div class="faq-body">
-                  Five categories — <strong>Structural</strong> (11),
-                  <strong>Quality</strong> (6), <strong>Reference</strong> (4),
-                  <strong>Security</strong> (5) and <strong>Resource</strong> (2).
-                  Each has a stable rule ID like <code>frontmatter.name.mismatch</code>
-                  or <code>security.dangerous-command</code>. Full table in
-                  <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.3</div>
-              <details class="faq-content">
-                <summary>Does it phone home?</summary>
-                <div class="faq-body">
-                  No telemetry, no analytics, no remote calls. The plugin reads
-                  <code>SKILL.md</code> inside the open project and runs every
-                  inspection locally. Safe for air-gapped environments.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.4</div>
-              <details class="faq-content">
-                <summary>What does "Quick Fix" actually do?</summary>
-                <div class="faq-body">
-                  Conservative, deterministic fixes only: <strong>add missing
-                  frontmatter</strong>, <strong>add a <code>name</code> field</strong>,
-                  <strong>sync <code>name</code> with the parent directory</strong>,
-                  <strong>convert <code>name</code> to kebab-case</strong>,
-                  <strong>add a <code>description</code> stub</strong>, and
-                  <strong>create the empty referenced file (with parent
-                  directories)</strong>. The plugin never rewrites your prose.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.5</div>
-              <details class="faq-content">
-                <summary>How does this differ from a generic Markdown linter?</summary>
-                <div class="faq-body">
-                  Skill Inspector is <em>Agent-Skills-aware</em>. It parses the
-                  YAML frontmatter as a real <code>SkillFrontMatter</code> record,
-                  knows that <code>name</code> must equal the parent directory,
-                  validates relative links inside the skill directory (with
-                  cross-OS case-mismatch detection), and scans for security
-                  risks. A generic Markdown linter does none of that.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.6</div>
-              <details class="faq-content">
-                <summary>It only triggers on files literally named <code>SKILL.md</code>?</summary>
-                <div class="faq-body">
-                  Correct. The inspection's first gate is
-                  <code>PsiFile.getName().equals("SKILL.md")</code>. That keeps
-                  <code>readme.md</code>, <code>notes.md</code> and any other
-                  Markdown file completely untouched, so the plugin is invisible
-                  until you actually open a skill file.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.7</div>
-              <details class="faq-content">
-                <summary>Can I disable the whole thing temporarily?</summary>
-                <div class="faq-body">
-                  Yes — a status-bar widget toggles all inspections on or off with
-                  a single click, no need to hunt through <em>Settings →
-                  Inspections</em>. <em>Tools → Skill Inspector</em> is the
-                  settings page for finer control.
-                </div>
-              </details>
-            </article>
-
-            <article class="faq-item">
-              <div class="faq-num">§6.8</div>
-              <details class="faq-content">
-                <summary>Is it open source? What license?</summary>
-                <div class="faq-body">
-                  Yes — <strong>MIT</strong>, sources on
-                  <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">GitHub</a>.
-                  Issues, PRs and new rules are welcome — see
-                  <a href="https://github.com/dong4j/skill-inspector/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>
-                  for the contributor guide.
-                </div>
-              </details>
-            </article>
-          </div>
-        </div>
-      </section>
-    </main>
-
+<main id="top">
     <!-- ================================================================
-         §7 Final CTA — 黑底严肃横幅, 红色裁切线作为印刷感装饰
-         Element 10
+         §1 Hero — Editorial 大标 + marginalia 右栏
+         Element 3 (title) + 4 (CTA) + 5 (social proof in marginalia)
          ================================================================ -->
-    <section class="final-cta" aria-label="Get the plugin">
-      <div class="container final-cta-inner">
-        <div>
-          <h2 class="final-cta-title">
-            Stop shipping broken <em>SKILL.md</em> files.
-          </h2>
-          <p class="final-cta-sub">
-            Install from JetBrains Marketplace, open any project that contains
-            a <code class="mono">SKILL.md</code>, and start seeing results in
-            the same second. That is the whole onboarding.
-          </p>
-          <div class="final-cta-meta">
-            <span>MIT licensed</span>
-            <span>Java 21</span>
-            <span>IntelliJ 2024.2 → 2026.1</span>
-            <span>v2026.1.1000</span>
-          </div>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <div class="hero-eyebrow">
+                    <span class="section-num">§1 · Introduction</span>
+                </div>
+
+                <h1 class="hero-title">
+                    A linter
+                    <em>for <span class="underdash">SKILL.md</span>.</em>
+                    Right inside
+                    <em>the IDE.</em>
+                </h1>
+
+                <p class="hero-lead">
+                    Skill Inspector is a JetBrains IDE plugin that treats every
+                    <code>SKILL.md</code> as a first-class linted document —
+                    real-time inspections, quick fixes, and a Problems-panel
+                    integration anchored to the official
+                    <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;specification</a>,
+                    with zero external dependencies.
+                </p>
+
+                <div class="hero-cta">
+                    <a
+                            class="btn btn-primary btn-lg"
+                            href="https://plugins.jetbrains.com/plugin/31938"
+                            target="_blank"
+                            rel="noopener"
+                    >
+                        Install on Marketplace →
+                    </a>
+                    <a
+                            class="btn btn-ghost btn-lg"
+                            href="https://github.com/dong4j/skill-inspector"
+                            target="_blank"
+                            rel="noopener"
+                    >
+                        Source on GitHub
+                    </a>
+                </div>
+            </div>
+
+            <!-- Marginalia 右栏: 杂志页眉式元数据栏, 同时承担 social proof -->
+            <aside aria-label="Plugin metadata">
+                <dl class="marginalia">
+                    <div>
+                        <dt>Rules shipped</dt>
+                        <dd><strong>30<span class="em">+</span></strong></dd>
+                    </div>
+                    <div>
+                        <dt>Categories</dt>
+                        <dd><strong>5</strong> Structural · Quality · Reference · Security · Resource</dd>
+                    </div>
+                    <div>
+                        <dt>External deps</dt>
+                        <dd><strong>0</strong> Pure IntelliJ Platform API</dd>
+                    </div>
+                    <div>
+                        <dt>License</dt>
+                        <dd>MIT, free forever</dd>
+                    </div>
+                    <div>
+                        <dt>Compatibility</dt>
+                        <dd>IntelliJ IDEA <span class="mono">2024.2 — 2026.1</span></dd>
+                    </div>
+                    <div>
+                        <dt>Runtime</dt>
+                        <dd>Java 21</dd>
+                    </div>
+                </dl>
+            </aside>
         </div>
-        <div class="final-cta-side">
-          <a
-            class="btn btn-primary btn-lg"
-            href="https://plugins.jetbrains.com/plugin/31938"
-            target="_blank"
-            rel="noopener"
-          >
-            Install on Marketplace →
-          </a>
-          <a
-            class="btn btn-ghost btn-lg"
-            href="https://github.com/dong4j/skill-inspector"
-            target="_blank"
-            rel="noopener"
-          >
-            Browse the source
-          </a>
-        </div>
-      </div>
     </section>
 
     <!-- ================================================================
-         Element 11: Footer (Colophon)
+         §2 Rules Manifest — 真实表格 (Lint 工具最有说服力的展示)
+         Element 7 (features) 的一部分: 把规则集摊在台面上, 像 spec 一样
          ================================================================ -->
-    <footer class="site-footer">
-      <div class="container">
+    <section id="rules">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§2 · The Manifest</div>
+                    <div class="meta-line">Every rule, on the record.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        Thirty rules. Five categories. <em>One opinionated baseline.</em>
+                    </h2>
+                    <p class="section-lead">
+                        Rules are grouped by determinism and risk, the same way IDEA
+                        groups inspection results. Every rule has a stable ID you can
+                        cite, suppress, or report against — no opaque "AI says so"
+                        heuristics.
+                    </p>
+                </div>
+            </header>
+
+            <div class="rules-table-wrap reveal">
+                <table class="rules-table" aria-label="Selected inspection rules">
+                    <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-id">Rule ID</th>
+                        <th>Severity</th>
+                        <th>Description</th>
+                        <th class="col-fix">Quick Fix</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="col-num">2.01</td>
+                        <td class="col-id"><code>frontmatter.missing</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">No YAML frontmatter; all subsequent field checks are skipped.</td>
+                        <td class="col-fix has-fix">ADD_FRONT_MATTER</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.02</td>
+                        <td class="col-id"><code>frontmatter.name.mismatch</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc"><code>name</code> field does not equal the parent directory name.</td>
+                        <td class="col-fix has-fix">SYNC_NAME_WITH_DIRECTORY</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.03</td>
+                        <td class="col-id"><code>frontmatter.name.invalid</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc"><code>name</code> does not match <code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>.</td>
+                        <td class="col-fix has-fix">CONVERT_NAME_TO_KEBAB</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.04</td>
+                        <td class="col-id"><code>frontmatter.description.missing</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">Missing or empty <code>description</code>; agents cannot trigger.</td>
+                        <td class="col-fix has-fix">ADD_DESCRIPTION</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.05</td>
+                        <td class="col-id"><code>description.too-generic</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">Description is one of <code>helper</code>, <code>tool</code>, <code>skill</code>, <code>assistant</code>,
+                            <code>utility</code>.
+                        </td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.06</td>
+                        <td class="col-id"><code>description.missing-usage</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">No trigger phrase (<em>"use when"</em>, <em>"when to use"</em>, etc.).</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.07</td>
+                        <td class="col-id"><code>reference.missing-file</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">Relative link target does not exist on disk.</td>
+                        <td class="col-fix has-fix">CREATE_MISSING_REFERENCE</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.08</td>
+                        <td class="col-id"><code>reference.case-mismatch</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">Link case differs from on-disk entry (will break on Linux).</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.09</td>
+                        <td class="col-id"><code>resource.unused-reference</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">File under <code>references/</code> is never linked from <code>SKILL.md</code>.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.10</td>
+                        <td class="col-id"><code>security.dangerous-command</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">Detects <code>rm -rf /</code> or piped <code>curl … | sh</code> in body.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.11</td>
+                        <td class="col-id"><code>security.secret-pattern</code></td>
+                        <td><span class="sev sev-error">Error</span></td>
+                        <td class="col-desc">Suspected <code>api_key</code>, <code>token</code>, <code>secret</code>, <code>password</code>
+                            or high-entropy value.
+                        </td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num">2.12</td>
+                        <td class="col-id"><code>security.sensitive-path</code></td>
+                        <td><span class="sev sev-warning">Warn</span></td>
+                        <td class="col-desc">Body steers towards <code>~/.ssh</code>, <code>.env</code>, <code>~/.aws</code>.</td>
+                        <td class="col-fix">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 5 类规则统计 tally — 表格底部, 像 spec 的 "Total" 行 -->
+            <div class="rules-tally reveal-stagger">
+                <div class="tally-item">
+                    <div class="tally-cat">Structural</div>
+                    <div class="tally-num">11<em>·</em></div>
+                    <div class="tally-label">Error · frontmatter, naming, length</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">Quality</div>
+                    <div class="tally-num">6<em>·</em></div>
+                    <div class="tally-label">Warning · description, body, triggers</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">Reference</div>
+                    <div class="tally-num">4<em>·</em></div>
+                    <div class="tally-label">Warning · links, paths, case</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">Security</div>
+                    <div class="tally-num">5<em>·</em></div>
+                    <div class="tally-label">Error · secrets, dangerous cmds</div>
+                </div>
+                <div class="tally-item">
+                    <div class="tally-cat">Resource</div>
+                    <div class="tally-num">2<em>·</em></div>
+                    <div class="tally-label">Warning · unused refs, scripts</div>
+                </div>
+            </div>
+
+            <p class="rules-cta reveal">
+                ↳ The complete table, with severities and quick-fix mappings, lives in
+                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
+            </p>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §3 Features — 编号大数字 + 段落 (替代 bento 卡片网格)
+         Element 7 的另一面: 不是规则集而是 "为什么用它"
+         ================================================================ -->
+    <section id="features">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§3 · Capabilities</div>
+                    <div class="meta-line">Six things the plugin does, plainly.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        Not a wrapper around a generic linter. <em>Agent-Skills-aware, end to end.</em>
+                    </h2>
+                    <p class="section-lead">
+                        Every capability removes a real friction in writing
+                        <code>SKILL.md</code>: missing fields shipped to production,
+                        broken relative links, dangerous shell snippets, descriptions
+                        Agents cannot trigger on.
+                    </p>
+                </div>
+            </header>
+
+            <div class="features-list reveal-stagger">
+                <article class="feature">
+                    <div class="feature-num">01</div>
+                    <h3 class="feature-title">Real-time <em>inspection.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            A <code>LocalInspectionTool</code> attaches to every
+                            <code>SKILL.md</code> file (gated strictly on file name, so other
+                            Markdown stays untouched). Errors and warnings appear live in the
+                            editor gutter and Problems panel — exactly like a Kotlin or Java
+                            file would.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">02</div>
+                    <h3 class="feature-title">Conservative <em>quick fixes.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            Add missing frontmatter, sync <code>name</code> with the parent
+                            directory, convert to kebab-case, scaffold a missing reference —
+                            one <kbd>Alt</kbd>+<kbd>Enter</kbd> away. The plugin never
+                            rewrites your prose.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">03</div>
+                    <h3 class="feature-title">Project-wide <em>scan.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            Right-click → <em>Validate&nbsp;Skill</em>. A background task
+                            <code>FilenameIndex</code>-scans every <code>SKILL.md</code>,
+                            aggregates a clean Error/Warning summary, and jumps to the first
+                            failing file. Works in CI via headless inspection too.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">04</div>
+                    <h3 class="feature-title">Specification-first <em>by default.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            Rules anchor on the official
+                            <a href="https://agentskills.io/specification" target="_blank" rel="noopener">Agent&nbsp;Skills&nbsp;specification</a>,
+                            not any single Agent's private extension. Agent-specific quirks
+                            become advisory profiles in V2 — never default errors. Your
+                            skills stay portable.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">05</div>
+                    <h3 class="feature-title">Status-bar <em>switch.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            A status-bar widget toggles the whole inspection on or off with a
+                            single click — no hunting through <em>Settings → Inspections</em>.
+                            Fine-grained tuning lives at <em>Tools → Skill Inspector</em>.
+                        </p>
+                        <a class="read-more" href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
+                            Rules reference →
+                        </a>
+                    </div>
+                </article>
+
+                <article class="feature">
+                    <div class="feature-num">06</div>
+                    <h3 class="feature-title">Zero <em>dependencies.</em></h3>
+                    <div class="feature-body">
+                        <p>
+                            Pure IntelliJ Platform API — no third-party plugin kit, no
+                            telemetry, no remote calls. Safe in air-gapped enterprise
+                            environments; <code>jar -tf</code> the bundled plugin if you want
+                            to verify.
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §4 Code Diff Gallery — 真实 before/after, 取代 IDE 截图 mockup
+         Element 6 (media) 的重新解读: 对 Lint 工具来说, 修复前后对比
+         是最有说服力的视觉证明
+         ================================================================ -->
+    <section id="diffs">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§4 · Examples</div>
+                    <div class="meta-line">Before · after, three real cases.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        What a fixed <code class="mono">SKILL.md</code> <em>actually looks like.</em>
+                    </h2>
+                    <p class="section-lead">
+                        Three minimal examples drawn from the rule manifest above. Each
+                        pair shows the input that triggers the inspection, and the file
+                        after a single <kbd>Alt</kbd>+<kbd>Enter</kbd>.
+                    </p>
+                </div>
+            </header>
+
+            <div class="diff-grid reveal-stagger">
+                <!-- Diff 1: name mismatch + kebab fix -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">frontmatter.name.mismatch</div>
+                        <h3 class="diff-h">The <em>name</em> must match the directory.</h3>
+                        <p class="diff-cap-body">
+                            Agents discover a skill by directory name. If <code>name</code>
+                            drifts (snake_case, capitalisation, typo), the skill stops
+                            being addressable.
+                            <span class="fix">Quick Fix · SYNC_NAME_WITH_DIRECTORY</span>
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— Before</span><span>code-reviewer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vr">code_reviewer</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ After</span><span>code-reviewer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="vg">code-reviewer</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="v">Use when reviewing PR diffs.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Diff 2: missing description + ADD_DESCRIPTION -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">frontmatter.description.missing</div>
+                        <h3 class="diff-h">Without a <em>description,</em> no Agent can trigger.</h3>
+                        <p class="diff-cap-body">
+                            The <code>description</code> field is what the discovery loader
+                            reads before the body. Empty means the skill is invisible to
+                            every Agent on every prompt.
+                            <span class="fix">Quick Fix · ADD_DESCRIPTION</span>
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— Before</span><span>commit-helper/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vr"></span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ After</span><span>commit-helper/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">1</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">2</span><span class="marker"></span><span class="code"><span class="k">name:</span> <span class="v">commit-helper</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">3</span><span class="marker"></span><span class="code"><span class="k">description:</span> <span class="vg">Use when generating a commit message from staged changes.</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">4</span><span class="marker"></span><span class="code"><span class="c">---</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Diff 3: security.dangerous-command (no auto-fix, just flagged) -->
+                <article class="diff-item">
+                    <div class="diff-caption">
+                        <div class="diff-rule">security.dangerous-command</div>
+                        <h3 class="diff-h">Some things must not <em>auto-fix.</em></h3>
+                        <p class="diff-cap-body">
+                            Security rules locate and flag, never rewrite. A piped
+                            <code>curl … | sh</code> is reported with a precise text range so
+                            you can decide: pin a hash, swap the source, or accept the risk
+                            with a <code>noinspection</code> comment.
+                        </p>
+                    </div>
+                    <div class="diff-blocks">
+                        <div class="diff-block before">
+                            <div class="diff-block-head"><span class="tag">— Reported</span><span>installer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span>
+                                </div>
+                                <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span>
+                                </div>
+                                <div class="diff-line del">
+                                    <span class="ln">10</span><span class="marker"></span><span class="code"><span class="vr">    curl https://x.example/install.sh | sh</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diff-block after">
+                            <div class="diff-block-head"><span class="tag">+ Suggested</span><span>installer/SKILL.md</span></div>
+                            <div class="diff-block-body">
+                                <div class="diff-line">
+                                    <span class="ln">7</span><span class="marker"></span><span class="code"><span class="c">## Install</span></span>
+                                </div>
+                                <div class="diff-line">
+                                    <span class="ln">8</span><span class="marker"></span><span class="code"><span class="v">Run the following to bootstrap:</span></span>
+                                </div>
+                                <div class="diff-line"><span class="ln">9</span><span class="marker"></span><span class="code">&nbsp;</span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">10</span><span class="marker"></span><span class="code"><span class="vg">    curl -fsSL https://x.example/install.sh -o /tmp/install.sh</span></span>
+                                </div>
+                                <div class="diff-line add">
+                                    <span class="ln">11</span><span class="marker"></span><span class="code"><span class="vg">    sha256sum -c install.sh.sha256 &amp;&amp; sh /tmp/install.sh</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §5 Who it's for — blockquote 风, 不造假 testimonials
+         Element 8: 用 editorial 引述代替假人名假头像
+         ================================================================ -->
+    <section id="personas">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§5 · Audience</div>
+                    <div class="meta-line">Four scenarios, no fabricated quotes.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        The plugin was designed around <em>four real audiences.</em>
+                    </h2>
+                    <p class="section-lead">
+                        Until the project has more shipped users, these are the scenarios
+                        Skill Inspector was built to serve. We refuse to invent quotes
+                        with stock photos — when real users speak up, the words below
+                        will be replaced verbatim.
+                    </p>
+                </div>
+            </header>
+
+            <div class="personas reveal-stagger">
+                <article class="persona">
+                    <p class="persona-quote">
+                        I want my <code>SKILL.md</code> to fail loudly <em>before</em> I commit it.
+                    </p>
+                    <div class="persona-cite">Skill author</div>
+                    <p class="persona-body">
+                        Open the file in IDEA. Missing required fields, directory-name
+                        drift, or a dead relative link — all surface in the gutter before
+                        you push. <kbd>Alt</kbd>+<kbd>Enter</kbd> applies the deterministic
+                        fix; the prose stays yours.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        My team writes skills for several agents. I need <em>one quality bar.</em>
+                    </p>
+                    <div class="persona-cite">Team lead</div>
+                    <p class="persona-body">
+                        Every developer's IDE sees the same inspection results because
+                        the rules live in the plugin, not in personal configs. CI can run
+                        the same <em>Validate Skill</em> sweep headlessly on every PR —
+                        non-spec-compliant skills never reach <code>main</code>.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        I publish skill bundles. Reviewers shouldn't waste time on <em>mechanical mistakes.</em>
+                    </p>
+                    <div class="persona-cite">OSS maintainer</div>
+                    <p class="persona-body">
+                        Structural, quality and reference rules catch the boring stuff
+                        automatically — name mismatches, dead links, descriptions too
+                        vague to trigger, <code>references/</code> files no one cites.
+                        Reviewers get to focus on <strong>content</strong>, not format.
+                    </p>
+                </article>
+
+                <article class="persona">
+                    <p class="persona-quote">
+                        I need to know if a skill ships <code>curl … | sh</code> or <em>leaks secrets.</em>
+                    </p>
+                    <div class="persona-cite">Security-aware enterprise</div>
+                    <p class="persona-body">
+                        Security rules flag dangerous commands, suspected API keys,
+                        high-entropy strings, sensitive paths (<code>~/.ssh</code>,
+                        <code>.env</code>) and prompt-injection phrases. V1 locates and
+                        reports only — never auto-rewrites — so review stays human-led.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         §6 FAQ — spec 风 §6.1 / §6.2 编号
+         Element 9
+         ================================================================ -->
+    <section id="faq">
+        <div class="container">
+            <header class="section-head reveal">
+                <div class="meta">
+                    <div class="section-num">§6 · Q&amp;A</div>
+                    <div class="meta-line">Honest answers, cited where possible.</div>
+                </div>
+                <div>
+                    <h2 class="section-title">
+                        Eight questions <em>before</em> you install.
+                    </h2>
+                </div>
+            </header>
+
+            <div class="faq-list reveal-stagger">
+                <article class="faq-item">
+                    <div class="faq-num">§6.1</div>
+                    <details class="faq-content">
+                        <summary>Which IDEs are supported?</summary>
+                        <div class="faq-body">
+                            IntelliJ IDEA Community / Ultimate <strong>2024.2 → 2026.1</strong>
+                            are the official baseline — the plugin declares
+                            <code>sinceBuild = 242.2</code> and <code>untilBuild = 261.*</code>.
+                            CI builds &amp; verifies against IC/IU 2024.2, 2024.3, 2025.1,
+                            2025.2 and 2025.3; 2026.1 is covered by the declared
+                            compatibility range. Other JetBrains IDEs on the same platform
+                            (PyCharm, GoLand, WebStorm, …) usually work within that build
+                            range, but only IDEA is tested by CI.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.2</div>
+                    <details class="faq-content">
+                        <summary>What rules ship today? Where is the full list?</summary>
+                        <div class="faq-body">
+                            Five categories — <strong>Structural</strong> (11),
+                            <strong>Quality</strong> (6), <strong>Reference</strong> (4),
+                            <strong>Security</strong> (5) and <strong>Resource</strong> (2).
+                            Each has a stable rule ID like <code>frontmatter.name.mismatch</code>
+                            or <code>security.dangerous-command</code>. Full table in
+                            <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">docs/rules.md</a>.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.3</div>
+                    <details class="faq-content">
+                        <summary>Does it phone home?</summary>
+                        <div class="faq-body">
+                            No telemetry, no analytics, no remote calls. The plugin reads
+                            <code>SKILL.md</code> inside the open project and runs every
+                            inspection locally. Safe for air-gapped environments.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.4</div>
+                    <details class="faq-content">
+                        <summary>What does "Quick Fix" actually do?</summary>
+                        <div class="faq-body">
+                            Conservative, deterministic fixes only: <strong>add missing
+                            frontmatter</strong>, <strong>add a <code>name</code> field</strong>,
+                            <strong>sync <code>name</code> with the parent directory</strong>,
+                            <strong>convert <code>name</code> to kebab-case</strong>,
+                            <strong>add a <code>description</code> stub</strong>, and
+                            <strong>create the empty referenced file (with parent
+                                directories)</strong>. The plugin never rewrites your prose.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.5</div>
+                    <details class="faq-content">
+                        <summary>How does this differ from a generic Markdown linter?</summary>
+                        <div class="faq-body">
+                            Skill Inspector is <em>Agent-Skills-aware</em>. It parses the
+                            YAML frontmatter as a real <code>SkillFrontMatter</code> record,
+                            knows that <code>name</code> must equal the parent directory,
+                            validates relative links inside the skill directory (with
+                            cross-OS case-mismatch detection), and scans for security
+                            risks. A generic Markdown linter does none of that.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.6</div>
+                    <details class="faq-content">
+                        <summary>It only triggers on files literally named <code>SKILL.md</code>?</summary>
+                        <div class="faq-body">
+                            Correct. The inspection's first gate is
+                            <code>PsiFile.getName().equals("SKILL.md")</code>. That keeps
+                            <code>readme.md</code>, <code>notes.md</code> and any other
+                            Markdown file completely untouched, so the plugin is invisible
+                            until you actually open a skill file.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.7</div>
+                    <details class="faq-content">
+                        <summary>Can I disable the whole thing temporarily?</summary>
+                        <div class="faq-body">
+                            Yes — a status-bar widget toggles all inspections on or off with
+                            a single click, no need to hunt through <em>Settings →
+                            Inspections</em>. <em>Tools → Skill Inspector</em> is the
+                            settings page for finer control.
+                        </div>
+                    </details>
+                </article>
+
+                <article class="faq-item">
+                    <div class="faq-num">§6.8</div>
+                    <details class="faq-content">
+                        <summary>Is it open source? What license?</summary>
+                        <div class="faq-body">
+                            Yes — <strong>MIT</strong>, sources on
+                            <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">GitHub</a>.
+                            Issues, PRs and new rules are welcome — see
+                            <a href="https://github.com/dong4j/skill-inspector/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>
+                            for the contributor guide.
+                        </div>
+                    </details>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ================================================================
+     §7 Final CTA — 黑底严肃横幅, 红色裁切线作为印刷感装饰
+     Element 10
+     ================================================================ -->
+<section class="final-cta" aria-label="Get the plugin">
+    <div class="container final-cta-inner">
+        <div>
+            <h2 class="final-cta-title">
+                Stop shipping broken <em>SKILL.md</em> files.
+            </h2>
+            <p class="final-cta-sub">
+                Install from JetBrains Marketplace, open any project that contains
+                a <code class="mono">SKILL.md</code>, and start seeing results in
+                the same second. That is the whole onboarding.
+            </p>
+            <div class="final-cta-meta">
+                <span>MIT licensed</span>
+                <span>Java 21</span>
+                <span>IntelliJ 2024.2 → 2026.1</span>
+                <span>v2026.1.1000</span>
+            </div>
+        </div>
+        <div class="final-cta-side">
+            <a
+                    class="btn btn-primary btn-lg"
+                    href="https://plugins.jetbrains.com/plugin/31938"
+                    target="_blank"
+                    rel="noopener"
+            >
+                Install on Marketplace →
+            </a>
+            <a
+                    class="btn btn-ghost btn-lg"
+                    href="https://github.com/dong4j/skill-inspector"
+                    target="_blank"
+                    rel="noopener"
+            >
+                Browse the source
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ================================================================
+     Element 11: Footer (Colophon)
+     ================================================================ -->
+<footer class="site-footer">
+    <div class="container">
         <div class="footer-grid">
-          <div class="footer-brand">
-            <a href="#top" class="brand">
+            <div class="footer-brand">
+                <a href="#top" class="brand">
               <span class="brand-mark" aria-hidden="true">
                 <img src="./assets/plugin-icon.svg" alt="">
               </span>
-              <span class="brand-name">
+                    <span class="brand-name">
                 <span>Skill Inspector</span>
               </span>
-            </a>
-            <p>
-              A JetBrains IDE plugin that lints <code class="mono">SKILL.md</code>
-              against the official Agent Skills specification — with real-time
-              inspections, quick fixes, and zero external dependencies.
-            </p>
-          </div>
+                </a>
+                <p>
+                    A JetBrains IDE plugin that lints <code class="mono">SKILL.md</code>
+                    against the official Agent Skills specification — with real-time
+                    inspections, quick fixes, and zero external dependencies.
+                </p>
+            </div>
 
-          <div class="footer-col">
-            <h4>Product</h4>
-            <ul>
-              <li><a href="#rules">Rules</a></li>
-              <li><a href="#features">Features</a></li>
-              <li><a href="#diffs">Examples</a></li>
-              <li><a href="#faq">FAQ</a></li>
-              <li>
-                <a
-                  href="https://plugins.jetbrains.com/plugin/31938"
-                  target="_blank"
-                  rel="noopener"
-                >Marketplace</a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#rules">Rules</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#diffs">Examples</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li>
+                        <a
+                                href="https://plugins.jetbrains.com/plugin/31938"
+                                target="_blank"
+                                rel="noopener"
+                        >Marketplace</a>
+                    </li>
+                </ul>
+            </div>
 
-          <div class="footer-col">
-            <h4>Resources</h4>
-            <ul>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
-                  Rules reference
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/design.md" target="_blank" rel="noopener">
-                  Design doc
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/roadmap.md" target="_blank" rel="noopener">
-                  Roadmap
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/dong4j/skill-inspector/issues" target="_blank" rel="noopener">
-                  Report an issue
-                </a>
-              </li>
-              <li>
-                <a href="https://agentskills.io/specification" target="_blank" rel="noopener">
-                  Agent Skills spec
-                </a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector" target="_blank" rel="noopener">
+                            GitHub
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/rules.md" target="_blank" rel="noopener">
+                            Rules reference
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/design.md" target="_blank" rel="noopener">
+                            Design doc
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/blob/main/docs/roadmap.md" target="_blank" rel="noopener">
+                            Roadmap
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/dong4j/skill-inspector/issues" target="_blank" rel="noopener">
+                            Report an issue
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://agentskills.io/specification" target="_blank" rel="noopener">
+                            Agent Skills spec
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-          <div class="footer-col">
-            <h4>Author</h4>
-            <ul>
-              <li><a href="https://github.com/dong4j" target="_blank" rel="noopener">@dong4j</a></li>
-              <li>
-                <a
-                  href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e"
-                  target="_blank"
-                  rel="noopener"
-                >Other plugins</a>
-              </li>
-              <li>
-                <a href="mailto:dong4j@gmail.com">Email</a>
-              </li>
-            </ul>
-          </div>
+            <div class="footer-col">
+                <h4>Author</h4>
+                <ul>
+                    <li><a href="https://github.com/dong4j" target="_blank" rel="noopener">@dong4j</a></li>
+                    <li>
+                        <a
+                                href="https://plugins.jetbrains.com/vendor/9afaba35-91ea-4364-8ced-64db868dd23e"
+                                target="_blank"
+                                rel="noopener"
+                        >Other plugins</a>
+                    </li>
+                    <li>
+                        <a href="mailto:dong4j@gmail.com">Email</a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <hr class="hairline">
 
         <div class="footer-bottom">
-          <span>© 2026 dong4j · MIT License</span>
-          <span class="colophon">
-            Set in your OS system font; code in <em>JetBrains&nbsp;Mono</em>.
-          </span>
+            <span>© 2026 dong4j · MIT License</span>
+            <span>Made for JetBrains developers who write Agent Skills.</span>
         </div>
-      </div>
-    </footer>
+    </div>
+</footer>
 
-    <script src="./assets/main.js" defer></script>
-  </body>
+<script src="./assets/main.js" defer></script>
+</body>
 </html>

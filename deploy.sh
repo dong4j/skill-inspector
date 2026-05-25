@@ -35,7 +35,7 @@ REMOTE_NGINX_CONF_DIR="${SKILL_INSPECTOR_DEPLOY_NGINX_DIR:-/etc/nginx/conf.d}"
 REMOTE_DATA_DIR="${SKILL_INSPECTOR_DEPLOY_DATA_DIR:-}"
 
 # 部署完成后输出的访问地址 (仅文案展示, 不影响实际部署逻辑).
-SITE_URL="${SKILL_INSPECTOR_DEPLOY_SITE_URL:-https://skill-inspector.example.com}"
+SITE_URL="${SKILL_INSPECTOR_DEPLOY_SITE_URL:-https://skill-inspector.dong4j.site}"
 
 # Marketplace plugin ID (发布完成后输出 Marketplace 链接用).
 # 当前已上架: https://plugins.jetbrains.com/plugin/31938
@@ -46,10 +46,10 @@ PLUGIN_MARKETPLACE_ID="${SKILL_INSPECTOR_MARKETPLACE_ID:-31938}"
 ############################################
 PLUGIN_NAME="skill-inspector"
 LANDING_DIR="$SCRIPT_DIR/landing"
-NGINX_CONF_FILE="$LANDING_DIR/nginx.conf"
+NGINX_CONF_FILE="$LANDING_DIR/skill-inspector.dong4j.site.conf"
 ZIP_DIR="$SCRIPT_DIR/build/distributions"
 GRADLE_PROPERTIES="$SCRIPT_DIR/gradle.properties"
-NGINX_REMOTE_CONF_NAME="${PLUGIN_NAME}.conf"
+NGINX_REMOTE_CONF_NAME="skill-inspector.dong4j.site.conf"
 
 MARKETPLACE_URL="https://plugins.jetbrains.com/plugin/$PLUGIN_MARKETPLACE_ID"
 
@@ -68,7 +68,7 @@ Skill Inspector 部署脚本
   -p              仅发布到 JetBrains Marketplace 默认通道 (publishDefault)
   -P              仅发布到 Marketplace beta 通道 (publishBeta)
   -z              仅打 zip + 上传到下载站 (REMOTE_ROOT_DIR + 可选 REMOTE_DATA_DIR)
-  -n              仅部署 nginx 配置 (landing/nginx.conf) 并远程 reload
+  -n              仅部署 nginx 配置 (landing/skill-inspector.dong4j.site.conf) 并远程 reload
   -v <version>    先把 gradle.properties 中 pluginVersion 改为此值, 再继续后续步骤
   -h              显示本帮助
 
@@ -161,7 +161,7 @@ $do_publish      && echo "  ✓ publishDefault → JetBrains Marketplace"
 $do_publish_beta && echo "  ✓ publishBeta   → Marketplace beta 通道"
 $do_zip          && echo "  ✓ 上传 zip → $REMOTE_HOST:$REMOTE_ROOT_DIR/"
 $do_site         && echo "  ✓ rsync landing/ → $REMOTE_HOST:$REMOTE_ROOT_DIR/"
-$do_nginx        && echo "  ✓ 上传 nginx.conf 并 reload"
+$do_nginx        && echo "  ✓ 上传 skill-inspector.dong4j.site.conf 并 reload"
 [ -n "$VERSION" ] && echo "  ✓ 改 pluginVersion → $VERSION"
 echo "================================"
 echo ""
@@ -267,10 +267,10 @@ if $do_site; then
   ssh "$REMOTE_HOST" "mkdir -p $REMOTE_ROOT_DIR"
 
   # 全量同步, --delete 保证服务器与本地完全一致.
-  # 排除 nginx.conf — 它走 -n 单独部署, 不能跟着 root 一起放
+  # 排除 skill-inspector.dong4j.site.conf — 它走 -n 单独部署, 不能跟着 root 一起放
   # (放进站点 root 反而会被 nginx 当成静态资源外泄).
   rsync -avz --delete --progress \
-    --exclude 'nginx.conf' \
+    --exclude 'skill-inspector.dong4j.site.conf' \
     --exclude 'README.md' \
     --exclude '.DS_Store' \
     --exclude '*.log' \

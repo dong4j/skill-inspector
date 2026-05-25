@@ -209,7 +209,7 @@ curl -I https://skill-inspector.example.com/
 - [x] Customer testimonials — §5 blockquote 风 4 类受众 (拒绝造假).
 - [x] FAQ section — §6 spec 风 §6.1 / §6.2 编号.
 - [x] Final CTA — §7 黑底横幅 + 红色裁切线.
-- [x] Footer — 4 列 + colophon (字体 / 协议).
+- [x] Footer — 4 列 + 受众价值主张 ("Made for JetBrains developers who write Agent Skills").
 
 设计原则自检 (来自 `landing-page-guide-v2` "AVOID Generic AI Aesthetics"):
 
